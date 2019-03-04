@@ -46,7 +46,7 @@ class Operation {
 }
 
 const username = '13818323833'
-const password = '56712595'
+const password = '*******'
 const LINK_LOGNIN = `#header > div.header-nav > ul > li:nth-child(2) > a.login-button`
 const USERNAME_SELECTOR = `#main > main > form > div.form-body > div:nth-child(2) > input[type="text"]`
 const PASSWORD_SELECTOR = `#main > main > form > div.form-body > div:nth-child(3) > input[type="password"]`
