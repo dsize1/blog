@@ -1,0 +1,113 @@
+@charset "utf-8";
+
+html {
+  color:royalblue;
+  box-sizing: border-box;
+  background-color: #e6ecf0;
+  font-size: 20px;
+  line-height: 25px;
+  min-width: 936px;
+  scroll-behavior: smooth;
+  font-family: 
+    -apple-system, 
+    BlinkMacSystemFont, 
+    Helvetica Neue, 
+    PingFang SC, 
+    Microsoft YaHei, 
+    Source Han Sans SC, 
+    Noto Sans CJK SC, 
+    WenQuanYi Micro Hei, 
+    sans-serif;
+}
+
+@media (max-width: 1000px) {
+  html {
+    background-color: #fff;
+  }
+}
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+form,
+fieldset,
+input,
+button,
+textarea,
+p,
+th,
+td {
+  margin: 0;
+  padding: 0;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+fieldset,
+img {
+  border: 0;
+}
+
+address,
+caption,
+code,
+em,
+strong,
+th,
+optgroup {
+  font-style: inherit;
+  font-weight: inherit;
+}
+
+li {
+  list-style: none;
+}
+
+caption,
+th {
+  text-align: left;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 100%;
+  font-weight: bold;
+}
+
+input,
+button,
+textarea,
+select,
+optgroup,
+option {
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:visited {
+  color: royalblue;
+}
