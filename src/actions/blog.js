@@ -1,5 +1,8 @@
 import ajax from '../util/ajax'
 
+// const baseUrl = 'http://woai.lijinyan89.com/api'
+const baseUrl = 'http://localhost:8080/api'
+
 const firstQueryRequest = (lastFetch) => ({ type: 'FIRST_QUERY_REQUEST', payload: { lastFetch } })
 
 const queryRequest = (direction) => ({ type: 'QUERY_REQUEST', payload: { direction } })
@@ -22,7 +25,7 @@ const queryRequestSuccess = (res, fetchStatus, oldUnreadCount, direction, queryS
   const data = res.data.filter(item => (!fetchStatus.hasOwnProperty(item.id)))
   const ids = res.data.map(item => item.id)
   const unreadCount = oldUnreadCount + ids.length
-  const lastFetch = direction === 'bottom' ? data[data.length - 1].created_at : data[0].created_at
+  const lastFetch = direction === 'bottom' ? res.data[ids.length - 1].created_at : res.data[0].created_at
   const method = direction === 'bottom' ? 'push' : 'unshift'
   const action1 = querySuccessFunc({ method, ids, data })
   const action2 = timelineStateQueryUpdate({ direction, unreadCount, lastFetch })
@@ -79,7 +82,8 @@ export const handleQueryHomePosts = (direction) => (dispatch, getState) => {
     lastFetch = Date.now()
     dispatch(firstQueryRequest(lastFetch))
   }
-  const url = `home?d=${direction[0]}&l=${lastFetch}` 
+  if (!lastFetch) return null
+  const url = baseUrl + `/home?d=${direction[0]}&l=${lastFetch}` 
   const unreadCount = blog.homeTimeline.unreadCount
   const fetchStatus = blog.entities.posts.fetchStatus
   dispatch(queryRequest(direction))
@@ -107,7 +111,8 @@ export const handleQueryUserPosts = (user_id, direction) => (dispatch, getState)
     lastFetch = Date.now()
     dispatch(firstQueryRequest(lastFetch))
   }
-  const url = `?d=${direction[0]}&l=${lastFetch}`
+  if (!lastFetch) return null
+  const url = baseUrl + `/user/${user_id}?d=${direction[0]}&l=${lastFetch}`
   const unreadCount = blog.homeTimeline.unreadCount
   const fetchStatus = blog.entities.posts.fetchStatus
   dispatch(queryRequest(direction))
@@ -126,7 +131,7 @@ export const handleQueryUserPosts = (user_id, direction) => (dispatch, getState)
 
 export const handleQueryComments = (post_id) => (dispatch, getState) => {
   const { blog } = getState()
-  const url = `/post/${post_id}`
+  const url = baseUrl + `/post/${post_id}`
   const unreadCount = blog.homeTimeline.unreadCount
   const fetchStatus = blog.entities.comments.fetchStatus
   dispatch(queryRequest('bottom'))
@@ -140,7 +145,7 @@ export const handleQueryComments = (post_id) => (dispatch, getState) => {
 
 export const handlePublishPost = () => (dispatch, getState) => {
   const { blog, router } = getState()
-  const url = router.location.pathname
+  const url = baseUrl + router.location.pathname
   const { id: user_id, username: author, avatar } = blog.user
   if (!getFieldsValidate(blog.postEditor.fields)) {
     return dispatch(publishRequestFailure({message: '填写有误', inputField: 'postEditor'}))
@@ -171,7 +176,7 @@ export const handlePublishPost = () => (dispatch, getState) => {
 
 export const handlePublishComment = (post_id) => (dispatch, getState) => {
   const { blog, router } = getState()
-  const url = router.location.pathname
+  const url = baseUrl + router.location.pathname
   const { id: user_id, username: author, avatar } = blog.user
   if (!getFieldsValidate(blog.commentEditor.fields)) {
     return dispatch(publishRequestFailure({message: '填写有误', inputField: 'commentEditor'}))
@@ -203,7 +208,7 @@ export const handlePublishComment = (post_id) => (dispatch, getState) => {
 
 export const signup = () => (dispatch, getState) => {
   const { blog, router } = getState()
-  const url = router.location.pathname
+  const url = baseUrl + router.location.pathname
   if (!getFieldsValidate(blog.authentication.fields)) {
     return dispatch(authenticationFailure({message: '填写有误', inputField: 'authentication'}))
   }
@@ -213,7 +218,7 @@ export const signup = () => (dispatch, getState) => {
 
 export const login = () => (dispatch, getState) => {
   const { blog, router } = getState()
-  const url = router.location.pathname
+  const url = baseUrl + router.location.pathname
   if (!getFieldsValidate(blog.authentication.fields)) {
     return dispatch(authenticationFailure({message: '填写有误', inputField: 'authentication'}))
   }
@@ -276,7 +281,7 @@ export const handleXHRAbort = () => ({ type: 'XHR_ABORT' })
 
 export const handleSignout = () => (dispatch, getState) => {
   dispatch({ type: 'SIGNOUT' })
-  return ajax('GET', '/signout').then(({data}) => console.log(data.message), err => console.log(err))
+  return ajax('GET', baseUrl + '/signout').then(({data}) => console.log(data.message), err => console.log(err))
 } 
 
 export const handleSaveState = () => ({ type: 'SAVE_STATE'})
