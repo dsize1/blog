@@ -19,8 +19,8 @@ class Blog extends Component {
   }
 
   componentDidMount () {
-    if (!this.props.usersEntities[this.user_id] || 
-      this.props.usersEntities[this.user_id].timeline.length === 0) {
+    if (!this.props.usersEntities[this.user_id] 
+      || this.props.usersEntities[this.user_id].timeline.length === 0) {
       this._handleQueryRequest()
     }
   }

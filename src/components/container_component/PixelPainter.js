@@ -136,8 +136,8 @@ class PixelPainter extends Component {
   handelMouseEnter(e) {
     e.stopPropagation()
     this.setState({
-      offsetX: 627 + e.target.offsetLeft - e.clientX,
-      offsetY: 153 + e.target.offsetTop - e.clientY,
+      offsetX: 636 + e.target.offsetLeft - e.clientX,
+      offsetY: 158 + e.target.offsetTop - e.clientY,
       lastX: e.clientX,
       lastY: e.clientY
     })
@@ -196,8 +196,8 @@ class PixelPainter extends Component {
     } else {
       return
     }
-    const offsetX = 627 + e.target.offsetLeft - e.clientX
-    const offsetY = 153 + e.target.offsetTop - e.clientY
+    const offsetX = 636 + e.target.offsetLeft - e.clientX
+    const offsetY = 158 + e.target.offsetTop - e.clientY
     const origin = `${100 - offsetX}px ${100 - offsetY}px`
     const scale = `scale(${factor})`
     this.setState({
@@ -259,7 +259,7 @@ class PixelPainter extends Component {
   }
 
   componentDidMount () {
-    const ws = io('http://localhost:8082/')
+    const ws = io('http://woai.lijinyan89.com:8082/')
     this.ws = ws
 
     const DrawingBoard = this.DrawingBoard
@@ -304,6 +304,7 @@ class PixelPainter extends Component {
 
   componentWillUnmount () {
     this.DrawingBoard.removeEventListener('mouseenter', this.handelMouseEnter)
+    this.ws.close()
   }
 
   render () {

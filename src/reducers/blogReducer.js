@@ -78,7 +78,7 @@ const defaultState = {
         suffix: '',
         value: '',
         accept: 'image/png, image/jpeg, image/gif, image/jpg, image/svg+xml',
-        help: '只能上传以下类型的图片：png, jpeg, gif, jpg, svg。',
+        help: '只能上传图片。',
         error: '',
         validate: false,
         validator: {
@@ -91,7 +91,7 @@ const defaultState = {
         type: 'text',
         name: 'captcha',
         prefix: '',
-        suffix: '/captcha',
+        suffix: '/api/captcha',
         value: '',
         help: '输入验证码，注意大小写。',
         error: '',

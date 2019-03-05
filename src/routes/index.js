@@ -4,7 +4,8 @@ import {
   Route,
   Link,
   Switch,
-  withRouter
+  withRouter,
+  Redirect
 } from 'react-router-dom'
 import throttle from 'lodash.throttle'
 import AuthenticationRoute from './AuthenticationRoute'
@@ -151,7 +152,7 @@ const StyledSection = Styled.section`
 `
 const StyledRoutes = Styled.div`
   position: relative;
-  &>a {
+  &>div {
       display: block;
       border: 3px solid rgba(66,66,66,0.5);
       background-color: transparent;
@@ -165,7 +166,7 @@ const StyledRoutes = Styled.div`
       outline: none;
       user-select: none;
     }
-      &>a::before {
+      &>div::before {
         content: '';
         display: block;
         height: 1rem;
@@ -180,7 +181,7 @@ const StyledRoutes = Styled.div`
         left: 50%;
         transform: translate(-50%, -100%);
       }
-      &>a::after {
+      &>div::after {
         content: '';
         display: block;
         width: 8px;
@@ -244,11 +245,11 @@ class Routes extends Component {
             <h1>简易微博</h1>
             <nav>
               <ul>
-                <li><Link to='/'>首页</Link></li>
+                <li><Link to='/home'>首页</Link></li>
                 { 
                   id === '' ?
                     (<li><Link to='/authentication'>登录</Link></li>) :
-                    (<li><Link to='/' onClick={handleSignout}>登出</Link></li>)
+                    (<li><Link to='/home' onClick={handleSignout}>登出</Link></li>)
                 }
                 <li>
                   <Link 
@@ -285,24 +286,24 @@ class Routes extends Component {
             </StyledAside>
             <StyledSection>
               <Switch>
-                <Route path={`/pixelpainter`} component={PixelPainter}/>
-                <Route path={`/masonry`} component={Masonry}/>
-                <Route path={`/cube`} component={Cube}/>
+                <Route path='/pixelpainter'component={PixelPainter}/>
+                <Route path='/masonry' component={Masonry}/>
+                <Route path='/cube' component={Cube}/>
                 <Route path='/authentication' component={AuthenticationRoute}/>
-                <Route path={'/accessdenied'} component={AccessDenied}/>
-                <PrivateRoute path={`/user/:user_id`} condition={id} component={Blog}/>
-                <PrivateRoute path={`/user/${id}`} condition={id} component={Blog}/>
-                <PrivateRoute path={`/post/:post_id`} condition={id} component={Post}/>
-                <Route exact path={'/'} component={Home}/>
+                <Route path='/accessdenied' component={AccessDenied}/>
+                <PrivateRoute path='/user/:user_id' condition={id} component={Blog}/>
+                <PrivateRoute path='/post/:post_id' condition={id} component={Post}/>
+                <Route path='/home' component={Home}/>
+                <Route exec path='/' render={() => (<Redirect to={`/home`} />)}/>
                 <Route render={() => 404}/>
               </Switch>
             </StyledSection>
           </div>
         </StyledMain>
-        <Link to='#'
+        <div
           style={{display: `${this.state.visibleBackTop ? 'block' : 'none'}`}} 
           onClick={this._handleBackTop}>
-        </Link>
+        </div>
       </StyledRoutes>
     )
   }

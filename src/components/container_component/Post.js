@@ -40,8 +40,8 @@ class Post extends Component {
   }
 
   componentWillMount () {
-    if (!this.props.postsEntities[this.post_id] ||
-      this.props.postsEntities[this.post_id].timeline.length === 0) {
+    if (!this.props.postsEntities[this.post_id] 
+      || this.props.postsEntities[this.post_id].timeline.length === 0) {
       this.props.handleQueryRequest(this.post_id)
     }
   }

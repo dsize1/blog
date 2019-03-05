@@ -12,6 +12,7 @@ const StyledFormFile = styled.div`
     &>div:nth-of-type(1) {
       text-align: right;
       padding: 0 10px;
+      min-width: 20%;
     }
     &>div:nth-of-type(1)>span {
       color: red;
