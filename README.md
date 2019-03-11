@@ -1,5 +1,5 @@
 # blog
-## 使用React Express MongoDB构建一个前后端分离的微博。
+## 使用React Express MongoDB构建一个前后端分离的bbs。
   1. 使用Redux thunk管理站内状态
   2. 由React-Router提供前端路由
   3. 运用styled-components编写css样式
