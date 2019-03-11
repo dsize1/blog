@@ -10,9 +10,11 @@ import Signup from '../components/container_component/Signup'
 
 const StyledAuth = styled.div`
   margin-top: 5rem;
+  background-color: ${(props) => props.theme.bgc};
+  border-radius: 1rem;
 
     &>div:nth-of-type(1) {
-      padding: 0 25%;
+      padding: 0 10%;
       display: flex;
       flex-direction: row;
       justify-content: center;
@@ -22,17 +24,18 @@ const StyledAuth = styled.div`
       flex-grow: 1;
       text-align: center;
       box-sizing: border-box;
-      background-color: ${(props) => props.theme.bgc};
+      border-radius: 1rem;
+      color: white;
+      background-color: ${(props) => props.theme.color};
     }
 
     &>div:nth-of-type(1)>a:hover {
-      color: blue;
       text-decoration: underline;
     }
     &>div:nth-of-type(1).signup>a:nth-of-type(1),
     &>div:nth-of-type(1).login>a:nth-of-type(2) {
       background-color: #eee;
-      color: #888;
+      color: black;
     }
     &>div:nth-of-type(1).signup>a:nth-of-type(2),
     &>div:nth-of-type(1).login>a:nth-of-type(1) {
@@ -41,7 +44,8 @@ const StyledAuth = styled.div`
 `
 
 const StyledAuthForm = styled.div`
-  padding: 0 25%;
+  padding: 0 10%;
+  min-height: 20rem;
 `
 
 const AuthenticationRoute = ({match, location}) => {

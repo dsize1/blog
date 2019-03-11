@@ -24,8 +24,8 @@ import {
 import Styled from 'styled-components'
 
 const StyledHeader = Styled.header`
-  border-bottom: 2px solid #ccc;
-  margin-bottom: 8px;
+  border-bottom: .1rem solid #ccc;
+  margin-bottom: .4rem;
   background-color: #fff;
   &>.header-inner {
     min-height: 2.5rem;
@@ -39,9 +39,9 @@ const StyledHeader = Styled.header`
     justify-content: space-between;
   }
 
-  &>.header-inner>h1 {
+  &>.header-inner>a>h1 {
     font-size: 1.5rem;
-    margin-left
+    line-height: 1.75rem;
   }
 
   &>.header-inner>nav>ul {
@@ -49,7 +49,7 @@ const StyledHeader = Styled.header`
     flex-wrap: nowrap;
   }
   &>.header-inner>nav>ul>li {
-    margin: 0 10px;
+    margin: 0 .5rem;
   }
 
   &>.header-inner>nav>ul>li:nth-of-type(3)>a>img {
@@ -66,7 +66,7 @@ const StyledMain = Styled.main`
     &>.container {
       display: flex;
       align-items: flex-start;
-      padding: 0 16px;
+      padding: 0 .8rem;
     }
 
   @media (max-width: 1000px) {
@@ -80,8 +80,8 @@ const StyledMain = Styled.main`
 
 const StyledAside = Styled.aside`
   background-color: #fff;
-  min-width: 150px;
-  max-width: 150px;
+  min-width: 7.5rem;
+  max-width: 7.5rem;
 
   &>div:nth-of-type(1) {
     min-height: 6.25rem;
@@ -99,20 +99,20 @@ const StyledAside = Styled.aside`
   }
 
   &>div:nth-of-type(1)>a>img {
-    width: 80px;
-    height: 80px;
+    width: 4rem;
+    height: 4rem;
     background-color: transparent;
-    margin: 5px auto;
+    margin: .25rem auto;
     border-radius: 50%;
   }
 
   &>div:nth-of-type(2) {
     text-align: right;
-    padding: 10px 5px;
+    padding: .5rem .25rem;
   }
 
   &>div:nth-of-type(2) li {
-    margin: 10px 0 ;
+    margin: .5rem 0 ;
   }
 
   @media (max-width: 1000px) {
@@ -142,12 +142,12 @@ const StyledSection = Styled.section`
   background-color: #fff;
   position: relative;
   flex-shrink: 0;
-  margin-left: 10px;
+  margin-left: .5rem;
   margin-bottom: 0;
   width: 100%;
   min-height: calc(100vh - 3rem);
   @media (max-width: 1000px) {
-    margin-left: 0px;
+    margin-left: 0;
   }
 `
 const StyledRoutes = Styled.div`
@@ -156,8 +156,8 @@ const StyledRoutes = Styled.div`
       display: block;
       border: 3px solid rgba(66,66,66,0.5);
       background-color: transparent;
-      width: 50px;
-      height: 50px;
+      width: 2.5rem;
+      height: 2.5rem;
       box-sizing: border-box;
       border-radius: 50%;
       position: fixed;
@@ -172,10 +172,10 @@ const StyledRoutes = Styled.div`
         height: 1rem;
         width: 0;
         background-color: transparent;
-        border-top: 20px solid  transparent;
-        border-left: 12px solid transparent;
-        border-right: 12px solid transparent;
-        border-bottom: 20px solid  rgba(66,66,66,0.5);
+        border-top: 1rem solid  transparent;
+        border-left: .6rem solid transparent;
+        border-right: .6rem solid transparent;
+        border-bottom: 1rem solid  rgba(66,66,66,0.5);
         position: absolute;
         top: 50%;
         left: 50%;
@@ -184,8 +184,8 @@ const StyledRoutes = Styled.div`
       &>div::after {
         content: '';
         display: block;
-        width: 8px;
-        height: 20px;
+        width: .4rem;
+        height: 1rem;
         background-color: rgba(66,66,66,0.5);
         position: absolute;
         top: 50%;
@@ -242,7 +242,7 @@ class Routes extends Component {
       <StyledRoutes>
         <StyledHeader role='banner'>
           <div className='header-inner'>
-            <h1>简易微博</h1>
+            <Link to='/home'><h1>成的小站</h1></Link>
             <nav>
               <ul>
                 <li><Link to='/home'>首页</Link></li>

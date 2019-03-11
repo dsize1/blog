@@ -47,7 +47,7 @@ const defaultState = {
         prefix: '',
         suffix: '',
         value: '',
-        help: '账号需由长度为6至16个字母或数字组成，且首字符必须为字母。',
+        help: '账号需由长度为6至16个字母或数字组成，首字符须为字母。',
         error: '',
         validate: false,
         validator: {
@@ -118,8 +118,8 @@ const defaultState = {
         error: '',
         validate: false,
         validator: {
-          pattern: '^[\\S\\s]{8,}$',
-          message: '标题不可少于8个字'
+          pattern: '^[\\S\\s]{6,}$',
+          message: '标题不可少于6个字'
         }
       },
       content: {
@@ -132,8 +132,8 @@ const defaultState = {
         error: '',
         validate: false,
         validator: {
-          pattern: '^[\\S\\s]{10,150}$',
-          message: '内容不可少于10个字或者多于了150个字'
+          pattern: '^[\\S\\s]{8,150}$',
+          message: '内容不可少于8个字或者多于了150个字'
         }
       }
     }
@@ -152,7 +152,7 @@ const defaultState = {
         error: '',
         validate: false,
         validator: {
-          pattern: '^[\\S\\s]{10,150}$',
+          pattern: '^[\\S\\s]{8,150}$',
           message: '评论字数不够或者多于了150个字。'
         }
       }
@@ -239,6 +239,30 @@ const blogReducer = (state, action) => {
         })
 
       })
+    case 'QUERY_POSTS_WITH_ENTITY_SUCCESS': 
+      return produce(state, draft => {
+
+        const {
+          user_id,
+          ids,
+          data,
+          entity
+        } = action.payload
+        draft.entities['users'].entities[user_id] = {
+          ...entity,
+          user_id,
+          timeline: ids
+        }
+        draft.entities['users'].fetchStatus[user_id] = 'loaded'
+        data.forEach(post => {
+          draft.entities.posts.entities[post.id] = {
+            ...post,
+            timeline: []
+          }
+          draft.entities.posts.fetchStatus[post.id] = 'loaded'
+        })
+
+      })
     case 'QUERY_COMMENTS_SUCCESS':
       return produce(state, draft => {
 
@@ -266,6 +290,57 @@ const blogReducer = (state, action) => {
         console.log(action.payload.error)
 
       })
+    case 'DELETE_REQUEST':
+    case 'UPDATE_REQUEST':
+      return produce(state, draft => {
+
+        draft.homeTimeline.loading = true
+
+      })
+
+    case 'DELETE_REQUEST_SUCCESS':
+    return produce(state, draft => {
+
+      const {post_id, id} = action.payload
+      draft.homeTimeline.loading = false
+      draft.entities.posts.entities[post_id].timeline = draft.entities.posts.entities[post_id].timeline.filter((comment_id) => id !== comment_id)
+      delete draft.entities.comments.entities[id] 
+      delete draft.entities.comments.fetchStatus[id]
+
+    })
+    case 'UPDATE_COMMENT_REQUEST_SUCCESS':
+      return produce(state, draft => {
+
+        Object.entries(action.payload.entity).forEach(([key, value]) => {
+          draft.entities.comments.entities[action.payload.id][key] = value
+        })
+
+      })
+    case 'UPDATE_POST_REQUEST_SUCCESS':
+      return produce(state, draft => {
+
+        Object.entries(action.payload.entity).forEach(([key, value]) => {
+          draft.entities.posts.entities[action.payload.id][key] = value
+        })
+
+      })
+    case 'DELETE_REQUEST_FAILURE':
+      return produce(state, draft => {
+
+        const {message} = action.payload
+        draft.homeTimeline.loading = false
+        console.log(message)
+
+      })
+    case 'UPDATE_REQUEST_FAILURE': 
+      return produce(state, draft => {
+
+        const {message, inputField} = action.payload
+        draft.homeTimeline.loading = false
+        draft[inputField].message = message
+        console.log(message)
+
+      })
     case 'PUBLISH_REQUEST': 
       return produce(state, draft => {
 
@@ -278,7 +353,7 @@ const blogReducer = (state, action) => {
 
         draft.homeTimeline.loading = true
         draft.homeTimeline.isLoadingDirection = 'none'
-        draft.homeTimeline.lastFetch.top = action.payload.id
+        draft.homeTimeline.lastFetch[action.payload.direction] = action.payload.lastFetch
 
       })
     case 'PUBLISH_POST_SUCCESS': 
@@ -302,7 +377,7 @@ const blogReducer = (state, action) => {
           id,
           entity
         } = action.payload
-        draft.entities.posts.entities[post_id].timeline.unshift(id)
+        draft.entities.posts.entities[post_id].timeline.push(id)
         draft.entities.comments.entities[id] = {...entity, timeline: []}
         draft.entities.comments.fetchStatus[id] = 'loaded'
 
@@ -351,14 +426,6 @@ const blogReducer = (state, action) => {
         draft[inputField].message = message
 
       })
-    case 'TRACKING_DATA':
-      return produce(state, draft => {
-
-      })
-    case 'TRACKED_DATA':
-      return produce(state, draft => {
-
-      })
     case 'INPUTFIELD_CHANGE':
       return produce(state, draft => {
 
@@ -385,6 +452,17 @@ const blogReducer = (state, action) => {
           draft[inputField].fields[field].prefix = ''
           draft[inputField].fields[field].suffix = ''
           draft[inputField].fields[field].validate = false
+        })
+
+      })
+    case 'TRANSMIT_VALUES':
+      return produce(state, draft => {
+
+        const { inputField, entries } = action.payload
+        Object.entries(entries).forEach(([field, value]) => {
+          draft[inputField].fields[field].value = value
+          if (field !== 'content') 
+            draft[inputField].fields[field].validate = true
         })
 
       })

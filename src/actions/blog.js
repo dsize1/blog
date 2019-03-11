@@ -1,4 +1,5 @@
 import ajax from '../util/ajax'
+import { push } from 'connected-react-router'
 
 // const baseUrl = 'http://woai.lijinyan89.com/api'
 const baseUrl = 'http://localhost:8080/api'
@@ -11,13 +12,13 @@ const queryRequestFailure = (error) => ({ type: 'QUERY_REQUEST_FAILURE', payload
 
 const queryTimelineNotingMore = () => ({ type: 'QUERY_NOTING_MORE'})
 
-const initInputField = (inputField, message) => ({ type: 'INPUTFIELD_INIT', payload: {inputField , message} })
-
 const timelineStateQueryUpdate = (payload) => ({ type: 'TIMELINESTATE_QUERY_UPDATED', payload })
 
 const queryHomePostsSuccess = (payload) => ({ type: 'QUERY_HOME_POSTS_SUCCESS', payload })
 
 const queryUserPostsSuccess = (user_id) => (payload) => ({ type: 'QUERY_USER_POSTS_SUCCESS', payload: { ...payload, user_id } })
+
+const queryPostsWithEntitySuccess = (user_id, entity) => (payload) => ({ type: 'QUERY_POSTS_WITH_ENTITY_SUCCESS', payload: { ...payload, user_id , entity} })
 
 const queryCommentsSuccess = (post_id) => (payload) => ({ type: 'QUERY_COMMENTS_SUCCESS', payload: { ...payload, post_id } })
 
@@ -32,6 +33,20 @@ const queryRequestSuccess = (res, fetchStatus, oldUnreadCount, direction, queryS
   return [action1, action2]
 }
 const publishRequest = () => ({ type: 'PUBLISH_REQUEST' })
+
+const delRequest = () => ({ type: 'DELETE_REQUEST' })
+
+const updateRequest = () => ({ type: 'UPDATE_REQUEST'})
+
+const delRequestSuccess = (payload) => ({ type: 'DELETE_REQUEST_SUCCESS', payload})
+
+const delRequestFailure = (payload) => ({ type: 'DELETE_REQUEST_FAILURE', payload})
+
+const updateCommentRequestSuccess = (payload) => ({ type: 'UPDATE_COMMENT_REQUEST_SUCCESS', payload})
+
+const updatePostRequestSuccess = (payload) => ({ type: 'UPDATE_POST_REQUEST_SUCCESS', payload})
+
+const updateRequestFailure = (payload) => ({ type: 'UPDATE_REQUEST_FAILURE', payload})
 
 const getFieldsValidate = (fields) => Object.values(fields).every(({required, validate}) => !required || validate)
 
@@ -72,7 +87,17 @@ const authentication = (dispatch, url, options) => {
     })
 }
 
-export const handleQueryHomePosts = (direction) => (dispatch, getState) => {
+export const initInputField = (inputField, message) => ({ type: 'INPUTFIELD_INIT', payload: {inputField , message} })
+
+export const transmitValues = (inputField, entries) => ({ type: 'TRANSMIT_VALUES', payload: {inputField, entries}})
+
+export const handleQueryNewPublish = (queryPosts, publishCount, fetchPublishCount) => () => {
+  return queryPosts('top', publishCount).finally(() => {
+    fetchPublishCount()
+  })
+}
+
+export const handleQueryHomePosts = (direction, limit = 15 ) => (dispatch, getState) => {
   const { blog } = getState()
   let lastFetch
   if (direction) {
@@ -83,13 +108,13 @@ export const handleQueryHomePosts = (direction) => (dispatch, getState) => {
     dispatch(firstQueryRequest(lastFetch))
   }
   if (!lastFetch) return null
-  const url = baseUrl + `/home?d=${direction[0]}&l=${lastFetch}` 
+  const url = baseUrl + `/home?d=${direction[0]}&l=${lastFetch}&n=${limit}` 
   const unreadCount = blog.homeTimeline.unreadCount
   const fetchStatus = blog.entities.posts.fetchStatus
   dispatch(queryRequest(direction))
   return ajax('GET', url)
     .then(res => {
-      if (res.data.length) {
+      if (res.data.length !== 0) {
         dispatchAll(dispatch, queryRequestSuccess(res, fetchStatus, unreadCount, direction, queryHomePostsSuccess))
       } else {
         dispatch(queryRequestFailure('nothing more'))
@@ -101,7 +126,7 @@ export const handleQueryHomePosts = (direction) => (dispatch, getState) => {
     })
 }
 
-export const handleQueryUserPosts = (user_id, direction) => (dispatch, getState) => {
+export const handleQueryUserPosts = (user_id, direction, withUserinfo = false, limit = 15) => (dispatch, getState) => {
   const { blog } = getState()
   let lastFetch
   if (direction) {
@@ -112,13 +137,15 @@ export const handleQueryUserPosts = (user_id, direction) => (dispatch, getState)
     dispatch(firstQueryRequest(lastFetch))
   }
   if (!lastFetch) return null
-  const url = baseUrl + `/user/${user_id}?d=${direction[0]}&l=${lastFetch}`
+  const url = baseUrl + `/user/${user_id}?d=${direction[0]}&l=${lastFetch}&w=${withUserinfo ? 't' : 'f'}&n=${limit}`
   const unreadCount = blog.homeTimeline.unreadCount
   const fetchStatus = blog.entities.posts.fetchStatus
   dispatch(queryRequest(direction))
   return ajax('GET', url)
     .then(res => {
-      if (res.data.length) {
+      if (withUserinfo) {
+        dispatchAll(dispatch, queryRequestSuccess(res, fetchStatus, unreadCount, direction, queryPostsWithEntitySuccess(user_id, res.userinfo)))
+      } else if (res.data.length) {
         dispatchAll(dispatch, queryRequestSuccess(res, fetchStatus, unreadCount, direction, queryUserPostsSuccess(user_id)))
       } else {
         dispatch(queryRequestFailure('nothing more'))
@@ -137,7 +164,12 @@ export const handleQueryComments = (post_id) => (dispatch, getState) => {
   dispatch(queryRequest('bottom'))
   return ajax('GET', url)
     .then(res => {
-      dispatchAll(dispatch, queryRequestSuccess(res, fetchStatus, unreadCount, 'bottom', queryCommentsSuccess(post_id)))
+      if (res.data.length) {
+        dispatchAll(dispatch, queryRequestSuccess(res, fetchStatus, unreadCount, 'bottom', queryCommentsSuccess(post_id))) 
+      } else {
+        dispatch(queryRequestFailure('nothing more'))
+        dispatch(queryTimelineNotingMore())
+      }
     }).catch(err => {
       dispatch(queryRequestFailure(err))
     })
@@ -150,12 +182,13 @@ export const handlePublishPost = () => (dispatch, getState) => {
   if (!getFieldsValidate(blog.postEditor.fields)) {
     return dispatch(publishRequestFailure({message: '填写有误', inputField: 'postEditor'}))
   }
+  const now = Date.now()
   const body = {
     user_id,
     author,
     avatar,
-    created_at: Date.now(),
-    updated_at: Date.now(),
+    created_at: now,
+    updated_at: now,
     ...getFieldsValues(blog.postEditor.fields)
   }
   const headers = { "Content-Type": "application/json" }
@@ -165,7 +198,7 @@ export const handlePublishPost = () => (dispatch, getState) => {
       const { id } = res.data
       const entity = { ...body, id }
       dispatch(publishPostSuccess({user_id, id, entity}))
-      dispatch(timelineStatePublishUpdate({id}))
+      dispatch(timelineStatePublishUpdate({lastFetch: now, direction: 'top'}))
       dispatch(initInputField('postEditor', true))
     })
     .catch(({ message }) => {
@@ -181,13 +214,14 @@ export const handlePublishComment = (post_id) => (dispatch, getState) => {
   if (!getFieldsValidate(blog.commentEditor.fields)) {
     return dispatch(publishRequestFailure({message: '填写有误', inputField: 'commentEditor'}))
   }
+  const now = Date.now()
   const body = {
     user_id,
     post_id,
     author,
     avatar,
-    created_at: Date.now(),
-    updated_at: Date.now(),
+    created_at: now,
+    updated_at: now,
     ...getFieldsValues(blog.commentEditor.fields)
   }
   const headers = { "Content-Type": "application/json" }
@@ -197,12 +231,94 @@ export const handlePublishComment = (post_id) => (dispatch, getState) => {
       const { id } = res.data
       const entity = { ...body, id}
         dispatch(publishCommentSuccess({post_id, id, entity})) 
-        dispatch(timelineStatePublishUpdate({id}))
+        dispatch(timelineStatePublishUpdate({lastFetch: now, direction: 'bottom'}))
         dispatch(initInputField('commentEditor', true))
     })
     .catch(({ message }) => {
       dispatch(publishRequestFailure({message, inputField: 'commentEditor'}))
       dispatch(initInputField('commentEditor'))
+    })
+}
+
+export const handleDelComment = (post_id, id) => (dispatch, getState) => {
+  const { blog, router } = getState()
+  const user_id = blog.user.id
+  const url = baseUrl + router.location.pathname
+  const body = {
+    user_id,
+    id
+  } 
+  const headers = { "Content-Type": "application/json" }
+  dispatch(delRequest()) 
+  return ajax('DELETE', url, {body: JSON.stringify(body), headers})
+    .then(res => {
+      dispatch(delRequestSuccess({ post_id, id }))
+      dispatch(push(router.location.pathname))
+    })
+    .catch(({ message }) => {
+      dispatch(delRequestFailure({ message }))
+      dispatch(push('/home'))
+    })
+}
+
+export const handleUpdateComment = (handleShutDown, post_id, id, created_at) => (dispatch, getState) => {
+  const { blog, router } = getState()
+  const url = baseUrl + router.location.pathname
+  const now = Date.now()
+  if (!getFieldsValidate(blog.commentEditor.fields)) {
+    return dispatch(publishRequestFailure({message: '填写有误', inputField: 'commentEditor'}))
+  }
+  const {id: user_id, username: author, avatar} = blog.user
+  const body = {
+    id,
+    post_id,
+    created_at,
+    updated_at: now,
+    user_id,
+    author,
+    avatar,
+    ...getFieldsValues(blog.commentEditor.fields)
+  }  
+  const headers = { "Content-Type": "application/json" }
+  dispatch(updateRequest())
+  return ajax('PUT', url, {body: JSON.stringify(body), headers})
+    .then(res => {
+      dispatch(updateCommentRequestSuccess({id, entity: body}))
+      handleShutDown()
+    })
+    .catch(({ message }) => {
+      dispatch(updateRequestFailure({message, inputField: 'commentEditor'}))
+      dispatch(initInputField('commentEditor'))
+    })
+}
+
+export const handleUpdatePost = (handleShutDown, self_id, id, created_at) => (dispatch, getState) => {
+  const { blog } = getState()
+  const url = baseUrl + `/user/${self_id}`
+  const now = Date.now()
+  if (!getFieldsValidate(blog.postEditor.fields)) {
+    return dispatch(publishRequestFailure({message: '填写有误', inputField: 'postEditor'}))
+  }
+  const {id: user_id, username: author, avatar} = blog.user
+  const body = {
+    id,
+    created_at,
+    updated_at: now,
+    user_id,
+    author,
+    avatar,
+    ...getFieldsValues(blog.postEditor.fields)
+  }  
+  const headers = { "Content-Type": "application/json" }
+  dispatch(updateRequest())
+  return ajax('PUT', url, {body: JSON.stringify(body), headers})
+    .then(res => {
+      dispatch(updatePostRequestSuccess({id, entity: body}))
+      handleShutDown()
+    })
+    .catch(({ message }) => {
+      dispatch(updateRequestFailure({message, inputField: 'postEditor'}))
+      dispatch(initInputField('postEditor'))
     })
 }
 

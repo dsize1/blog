@@ -5,8 +5,8 @@ import Button from '../stateless_component/Button'
 const StyledForm = styled.form`
   background-color: ${(props) => props.theme.bgc};
   display: flow-root;
-  padding: 15px 10px;
-  border-radius: 5px;
+  padding: .75rem .5rem;
+  border-radius: 1rem;
 
     &::after {
       content: '',

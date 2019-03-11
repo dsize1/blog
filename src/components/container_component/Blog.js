@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import Form from '../form/Form'
-import FormInput from '../form/FormInput'
-import FormTextarea from '../form/FormTextarea'
+import PostEditor from './PostEditor'
 import PostsList from '../stateless_component/PostsList'
 import { 
   handleQueryUserPosts,
@@ -19,44 +17,43 @@ class Blog extends Component {
   }
 
   componentDidMount () {
-    if (!this.props.usersEntities[this.user_id] 
-      || this.props.usersEntities[this.user_id].timeline.length === 0) {
+    if (this.user_id === this.self_id && this.props.usersEntities[this.user_id].timeline.length === 0) {
       this._handleQueryRequest()
+    } else if (!this.props.usersEntities.hasOwnProperty(this.user_id)) {
+      this._handleQueryRequest(null, true)
     }
   }
 
   render () {
     const {
+      homeTimeline,
+      inputField,
+      handlePublishPost,
+      handleInputChange,
+      usersEntities,
+      posts
+    } = this.props
+    const {
       loading,
       isLoadingDirection,
       hasMore
-    } = this.props.homeTimeline
-    const form = this.user_id === this.self_id && 
-      ( <Form
-          btnTxt={'发布'}
-          fieldsName={'postEditor'}
-          inputField={this.props.inputField}
-          handleSubmit={this.props.handlePublishPost}
-          handleInputChange={this.props.handleInputChange}>
-          <FormInput 
-            requiredVisible={false}
-            name={'title'} 
-            type={'text'}/>
-          <FormTextarea 
-            requiredVisible={false}
-            name={'content'}/>
-        </Form>)
+    } = homeTimeline
+    const timeline = (usersEntities[this.user_id] && usersEntities[this.user_id].timeline) || []
     return (
       <div className='blog'>
-        { form }
+        { this.user_id === this.self_id 
+          && <PostEditor
+              inputField={inputField}
+              handleSubmit={handlePublishPost}
+              handleInputChange={handleInputChange}/> }
         <PostsList
           hasMore={hasMore}
           isLoadingDirection={isLoadingDirection}
           loading={loading}
           itemHeight={250}
           handleQueryRequest={this._handleQueryRequest}
-          timeline={this.props.usersEntities[this.user_id].timeline}
-          posts={this.props.posts}/>
+          timeline={timeline}
+          posts={posts}/>
       </div>
     )
   }
@@ -72,7 +69,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   handleQueryUserPosts: (...args) => dispatch(handleQueryUserPosts(...args)),
   handlePublishPost: () => dispatch(handlePublishPost()),
-  handleInputChange: (...args) => dispatch(handleInputChange(...args))
+  handleInputChange: (...args) => dispatch(handleInputChange(...args)),
 })
 const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(Blog)
 

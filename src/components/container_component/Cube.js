@@ -120,10 +120,6 @@ const StyledMagicCube = Styled.div`
     color: royalblue;
   }
 
-  .input-field input {
-    width: 90%;
-  }
-
   .input-field>*{
     margin: .5rem;
   }

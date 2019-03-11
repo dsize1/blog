@@ -22,6 +22,7 @@ const StyledFormCaptcha = styled.div`
       display: flex;
       flex-direction: row;
       align-items: flex-start;
+      max-height: 2.5rem;
     }
       &>div:nth-of-type(2)>div:nth-of-type(1)>div {
         text-align: center;

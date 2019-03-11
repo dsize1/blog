@@ -3,11 +3,12 @@ import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import User from '../stateless_component/User'
 import Timestamp from '../stateless_component/Timestamp'
+import Dropdown from '../stateless_component/Dropdown'
 
 const StyledComment = styled.div`
-  padding: 12px 15px;
+  padding: 0.6rem .75rem;
   position: relative;
-  padding-left: 100px;
+  padding-left: 5rem;
   border-bottom: 1px solid #ccc;
   &:hover {
     background-color: #eee;
@@ -16,7 +17,7 @@ const StyledComment = styled.div`
     &>div:nth-of-type(1) {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 5px;
+      margin-bottom: .25rem;
     }
 
     &>p {
@@ -34,9 +35,11 @@ const Comment = (props) => (
         avatar={props.avatar}
         user_id={props.user_id} 
         username={props.author}/>
-      <div>{`#${props.index+1}`}</div>
+      <Dropdown>
+        <li onClick={props.handleStartUp} disabled={props.user_id === props.self_id}>编辑</li>
+        <li onClick={props.handleDelComment} disabled={props.user_id === props.self_id}>删除</li>
+      </Dropdown>
     </div>
-
     <p className="content">{props.content}</p>
     <Timestamp 
       created_at={props.created_at}
@@ -47,13 +50,15 @@ const Comment = (props) => (
 
 Comment.propTypes = {
   avatar: PropTypes.string.isRequired,
-  index: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   user_id: PropTypes.string.isRequired,
-  username: PropTypes.string.isRequired,
+  self_id: PropTypes.string.isRequired,
   author: PropTypes.string.isRequired,
   content: PropTypes.string.isRequired,
   created_at: PropTypes.number.isRequired,
   updated_at: PropTypes.number.isRequired,
+  handleDelComment: PropTypes.func.isRequired,
+  handleStartUp: PropTypes.func.isRequired,
 }
 
 export default Comment 

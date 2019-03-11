@@ -26,8 +26,7 @@ const PostsList = (props) => {
             title={title} 
             content={content} 
             created_at={created_at}
-            updated_at={updated_at} 
-          />
+            updated_at={updated_at}/>
         </li>
       )
     })
@@ -40,7 +39,7 @@ const PostsList = (props) => {
 
 PostsList.propTypes = {
   timeline: PropTypes.array.isRequired,
-  posts: PropTypes.object.isRequired
+  posts: PropTypes.object.isRequired,
 }
 
 export default withVirtualScroll(PostsList)

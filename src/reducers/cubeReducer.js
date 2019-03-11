@@ -180,6 +180,7 @@ const cubeReducer= (state = defaultState, action) => {
         const cubes = createCube(colors)
         draft.cubes = cubes
         draft.globalDisplay = cubes.map(cube => cube.aspect.color)
+        draft.records = []
       })
     case 'VIEW_CHANGING':
       return produce(state, draft => {

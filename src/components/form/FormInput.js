@@ -21,6 +21,7 @@ const StyleFormInput = styled.div`
       display: flex;
       flex-direction: row;
       align-items: baseline;
+      max-height: 1.25rem;
     }
       &>div:nth-of-type(2)>div:nth-of-type(1)>div {
         text-align: center;

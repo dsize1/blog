@@ -60,7 +60,7 @@ const withVirtualScroll = (WrappedList) => {
         isLoadingDirection,
         loading,
         posts,
-        hasMore
+        hasMore,
       } = this.props
       const loadingTop = hasMore && isLoadingDirection === 'top' && loading
       const loadingBottom = hasMore && isLoadingDirection === 'bottom' && loading

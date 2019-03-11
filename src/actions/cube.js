@@ -203,7 +203,7 @@ const operationFlowGenerator = (ops, cubes, view) => {
 
 export const handleInputChange = (value) => ({ type: 'INPUT_CHANGE', value })
 
-export const handleInputSubmit = () => async (dispatch, getState) => {
+export const handleInputSubmit = () => (dispatch, getState) => {
   const operations = getState().cube.inputFieldValue.trim().split(' ')
   const submitting = getState().cube.submitting
   if( !operationsJudge(operations) || submitting === true) {
@@ -212,23 +212,27 @@ export const handleInputSubmit = () => async (dispatch, getState) => {
   const view = getState().cube.view
   const cubes = getState().cube.cubes
   const operationFlow = operationFlowGenerator(operations, cubes, view)
-  operationFlow.map(async (op, idx) => {
-    await setTimeout(() => dispatch(op), (idx + 1) * 300)
-  })
+  const ops = operationFlow.reduceRight((nextOp, op) => function (dispatch) {
+    dispatch(op)
+    if (nextOp) setTimeout(nextOp, 300, dispatch)
+  }, null)
+  ops(dispatch)
 }
 
-export const handleAutoArrangement = () => async (dispatch, getState) => {
+export const handleAutoArrangement = () => (dispatch, getState) => {
   const rotation  = Object.keys(rotationMap)
   const angle = Object.keys(angleMap)
   const operations = new Array(10)
     .fill(0)
     .map((_) => rotation[Math.floor(Math.random() * 6)] + angle[Math.floor(Math.random() * 3)])
-    const view = getState().cube.view
-    const cubes = getState().cube.cubes
-    const operationFlow = operationFlowGenerator(operations, cubes, view)
-    operationFlow.map(async (op, idx) => {
-      await setTimeout(() => dispatch(op), (idx + 1) * 300)
-    })
+  const view = getState().cube.view
+  const cubes = getState().cube.cubes
+  const operationFlow = operationFlowGenerator(operations, cubes, view)
+  const ops = operationFlow.reduceRight((nextOp, op) => function (dispatch) {
+    dispatch(op)
+    if (nextOp) setTimeout(nextOp, 300, dispatch)
+  }, null)
+  ops(dispatch)
 }
 
 export const handleRestore = () => ({ type: 'RESTORE' })

@@ -7,8 +7,8 @@ import Timestamp from '../stateless_component/Timestamp'
 
 const StyledPostDigest = styled.div`
   position: relative;
-  padding: 15px 15px 14px 0;
-  padding-left: 100px;
+  padding: .75rem .75rem 14px 0;
+  padding-left: 5rem;
   border-bottom: 1px solid #ccc;
   &:hover {
     background-color: #eee;
@@ -53,7 +53,7 @@ PostDigest.propTypes = {
   title: PropTypes.string.isRequired,
   content: PropTypes.string.isRequired,
   created_at: PropTypes.number.isRequired,
-  updated_at: PropTypes.number.isRequired,
+  updated_at: PropTypes.number.isRequired
 }
 
 export default PostDigest 
