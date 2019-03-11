@@ -39,6 +39,12 @@ const connectToMongoDB = () => {
   const _create = function (document) {
     return this.create(document).then(_callback)
   }
+  const _delById = function (id) {
+    return this.findByIdAndDelete(id).exec().then(_callback, _callback)
+  }
+  const _updateById = function (id, update) {
+    return this.findByIdAndUpdate(id, update).exec().then(_callback, _callback)
+  } 
 
   const userSchema = new mongoose.Schema({
     username: {
@@ -48,8 +54,11 @@ const connectToMongoDB = () => {
     password: String,
     avatar: String,
   }, schemaOptions)
-  userSchema.statics.login = function (query, selection) {
-    return this.findOne(query).select(selection).exec().then(_callback, _callback)
+  userSchema.statics.login = function (query) {
+    return this.findOne(query).select({ password: 0 }).exec().then(_callback, _callback)
+  }
+  userSchema.statics.getInfo = function (id) {
+    return this.findById(id).select({ password: 0 }).exec().then(_callback, _callback)
   }
   userSchema.statics.hasUser = function (query) {
     return this.findOne(query).exec().then(_callback, _callback)
@@ -67,15 +76,16 @@ const connectToMongoDB = () => {
     avatar: String,
   }, schemaOptions)
   postSchema.statics.addPost = _create
-  postSchema.statics.getPosts = function (direction, lastFetch, query = {}) {
+  postSchema.statics.getPosts = function (direction, lastFetch, limit, query = {}) {
     const compare = direction === 'b' ? 'lt' : 'gt'
     return this.find(query)
       .where('created_at')[compare](lastFetch)
-      .limit(15)
+      .limit(limit)
       .sort('-created_at')
       .exec()
       .then(_callback, _callback)
   }
+  postSchema.statics.updatePost = _updateById
   const Post = mongoose.model('Post', postSchema)
 
   const commentSchema = new mongoose.Schema({
@@ -89,8 +99,10 @@ const connectToMongoDB = () => {
   }, schemaOptions)
   commentSchema.statics.addComment = _create
   commentSchema.statics.getComments = function (query) {
-    return this.find(query).sort('-created_at').exec().then(_callback, _callback)
+    return this.find(query).sort('created_at').exec().then(_callback, _callback)
   }
+  commentSchema.statics.delComment = _delById
+  commentSchema.statics.updateComment = _updateById
   const Comment = mongoose.model('Comment', commentSchema)
 
   return {
@@ -198,10 +210,7 @@ app.route('/api/authentication')
       username,
       password
     }      
-    const selection = {
-      password: 0
-    }
-    const user = await User.login(query, selection) 
+    const user = await User.login(query) 
     if (user && sessionId && sessions[sessionId] && sessions[sessionId].text === captcha) {
       const id = user._id.toString()
       const { avatar } = user
@@ -278,55 +287,12 @@ app.route('/api/authentication/signup')
     
 //   })
 
-app.route('/api/user/:userid')
-  .get(async (req, res, next) => {
-    const direction = req.query.d
-    const lastFetch = req.query.l
-    const query = {user_id: req.params.userid}
-    const result = await Post.getPosts(direction, lastFetch, query)
-    const posts = result.map((model) => ({
-      author: model.author,
-      user_id: model.user_id,
-      id: model.id,
-      avatar: model.avatar,
-      title: model.title,
-      content: model.content,
-      created_at: model.created_at,
-      updated_at: model.updated_at
-    }))
-    req._databaseResponse = {
-      data: posts ,
-      errors: result.some((model) => model.errors !== undefined),
-      errorText: 'Internal server error!'
-    }
-    next()
-  })
-  .post(async (req, res, next) => {
-    const user_id = req.params.userid
-    if (user_id !== req.signedCookies.userId) {
-      res.clearCookie('sessionId')
-      res.clearCookie('userId')
-      res.redirect(302, '/authentication')
-    }
-    const post = await Post.addPost({
-      ...req.body,
-      user_id
-    })
-    req._databaseResponse = {
-      data: {
-        id: post._id.toString()
-      },
-      errors: post.errors,
-      errorText: 'Internal server error! Publish again Please.'
-    }
-    next()
-})
-
 app.route('/api/home')
   .get(async (req, res, next) => {
     const direction = req.query.d
     const lastFetch = req.query.l
-    const result = await Post.getPosts(direction, lastFetch)
+    const limit = Number.parseInt(req.query.n)
+    const result = await Post.getPosts(direction, lastFetch, limit)
     const posts = result.map((model) => ({
       author: model.author,
       avatar: model.avatar,
@@ -344,6 +310,94 @@ app.route('/api/home')
     }
     next()
 })
+
+app.route('/api/user/:userid')
+  .get(async (req, res, next) => {
+    const direction = req.query.d
+    const lastFetch = req.query.l
+    const limit = Number.parseInt(req.query.n)
+    const user_id = req.params.userid
+    const query = {user_id}
+    const result = await Post.getPosts(direction, lastFetch, limit, query)
+    console.log(result)
+    const posts = result.map((model) => ({
+      author: model.author,
+      user_id: model.user_id,
+      id: model.id,
+      avatar: model.avatar,
+      title: model.title,
+      content: model.content,
+      created_at: model.created_at,
+      updated_at: model.updated_at
+    }))
+    req._databaseResponse = {
+      data: posts ,
+      errors: result.some((model) => model.errors !== undefined),
+      errorText: 'Internal server error!'
+    }
+    if (req.query.w) {
+      const user = await User.getInfo(user_id)
+      req._databaseResponse.userinfo = {
+        username: user.username,
+        avatar: user.avatar
+      }
+    }
+    next()
+  })
+  .post(async (req, res, next) => {
+    if (req.params.userid !== req.signedCookies.userId) {
+      res.clearCookie('sessionId')
+      res.clearCookie('userId')
+      res.status(401).send({ code: 401, message: 'Unauthorized' })
+    } else {
+      const user_id = req.params.userid
+      const post = await Post.addPost({
+        ...req.body,
+        user_id
+      })
+      req._databaseResponse = {
+        data: {
+          id: post._id.toString()
+        },
+        errors: post.errors,
+        errorText: 'Internal server error! Publish again Please.'
+      }
+      next()
+    }  
+  })
+  .put(async (req, res, next) => {
+    const user_id = req.params.userid
+    const {
+      id,
+      avatar,
+      author,
+      title,
+      content,
+      created_at,
+      updated_at
+    } = req.body
+    if (user_id !== req.signedCookies.userId) {
+      res.clearCookie('sessionId')
+      res.clearCookie('userId')
+      res.status(401).send({ code: 401, message: 'Unauthorized' })
+    } else {
+      const result = await Post.updatePost(id, {
+        user_id,
+        avatar,
+        author,
+        title,
+        content,
+        created_at,
+        updated_at
+      })
+      req._databaseResponse = {
+        error: result.errors,
+        errorText: 'Internal server error! update again please'
+      }
+      next() 
+    }
+  })
+
 
 app.route('/api/post/:postid')
   .get(async (req, res, next) => {
@@ -360,32 +414,95 @@ app.route('/api/post/:postid')
       updated_at: model.updated_at
     }))
     req._databaseResponse = {
-      data: comments ,
+      data: comments,
       errors: result.some((model) => model.errors !== undefined),
       errorText: 'Internal server error!'
     }
     next()
   })
   .post(async (req, res, next) => {
+    const post_id = req.params.postid
     if (req.body.user_id !== req.signedCookies.userId) {
       res.clearCookie('sessionId')
       res.clearCookie('userId')
-      res.redirect(302, '/authentication')
+      res.status(401).send({code: 401, message: 'Unauthorized'})
+    } else {
+      const comment = await Comment.addComment({
+        ...req.body,
+        post_id
+      })
+      req._databaseResponse = {
+        data: {
+          id: comment._id.toString()
+        },
+        errors: comment.errors,
+        errorText: 'Internal server error! Publish again Please .'
+      }
+      next()
     }
-    const post_id = req.params.postid
-    const comment = await Comment.addComment({
-      ...req.body,
-      post_id
-    })
-    req._databaseResponse = {
-      data: {
-        id: comment._id.toString()
-      },
-      errors: comment.errors,
-      errorText: 'Internal server error! Publish again Please .'
-    }
-    next()
   })
+  .delete(async (req, res, next) => {
+    if (req.body.user_id !== req.signedCookies.userId) {
+      res.clearCookie('sessionId')
+      res.clearCookie('userId')
+      res.status(401).send({ code: 401, message: 'Unauthorized'})
+    } else {
+      const result = await Comment.delComment(req.body.id)
+      req._databaseResponse = {
+        errors: result.errors,
+        errorText: 'Internal server error! Delete again Please'
+      }
+      next()
+    }
+  })
+  .put(async (req, res, next) => {
+    const {
+      id,
+      post_id,
+      avatar,
+      author,
+      user_id,
+      content,
+      created_at,
+      updated_at
+    } = req.body
+    if (user_id !== req.signedCookies.userId) {
+      res.clearCookie('sessionId')
+      res.clearCookie('userId')
+      res.status(401).send({ code: 401, message: 'Unauthorized' })
+    } else {
+      const result = await Comment.updateComment(id, {
+        post_id,
+        avatar,
+        author,
+        user_id,
+        content,
+        created_at,
+        updated_at
+      })
+      req._databaseResponse = {
+        error:result.errors,
+        errorText: 'Internal server error! update again please'
+      }
+      next()
+    }
+  })
+
+app.get('/api/comet', async (req, res, next) => {
+  console.log(req.query.l, req.query.n)
+  setTimeout(async () => {
+    const result = await Post.getPosts('t', req.query.l, Number.parseInt(req.query.n))
+    let publishCount
+    if (result.some((model) => model.errors !== undefined)) {
+      publishCount = 0
+    } else {
+      publishCount = Array.isArray(result) ? result.length : 0
+    }
+    console.log(result)
+    res.json({data: {publishCount}})
+  }, 45 * 1000)
+})
+
 
 app.use((req, res, next) => {
   if (!req._databaseResponse) {
@@ -395,11 +512,16 @@ app.use((req, res, next) => {
   const {
     data,
     errorText,
-    errors
+    errors,
+    userinfo
   } = req._databaseResponse
   if (!errors) {
     console.log(data)
-    res.json({data})
+    if (userinfo) {
+      res.json({data, userinfo})
+    } else {
+      res.json({data})
+    }
   } else {
     console.log(errorText)
     res.status(500).send({message: errorText})
