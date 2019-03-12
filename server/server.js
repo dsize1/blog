@@ -9,7 +9,7 @@ const etag = require('etag')
 const upload = multer({dest: path.join(__dirname, './avatars')})
 const svgCaptcha = require('svg-captcha')
 
-const port = 8080
+const port = 80
 
 const connectToMongoDB = () => {
 
