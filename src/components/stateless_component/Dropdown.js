@@ -7,7 +7,7 @@ const StyledDropdown = styled.label`
   background-image: ${props => props.bgi };
   width: 1.25rem;
   height: 1.25rem;
-  display: flow-root;
+  display: ${props => props.display};
   &::before {
     content: '>';
     display: block;
@@ -62,7 +62,8 @@ const StyledDropdown = styled.label`
 const Dropdown = (props) => {
   return (
     <StyledDropdown
-      bgi={props.bgi}>       
+      bgi={props.bgi}
+      display={props.display}>       
       <ul>
         { props.children }
       </ul>

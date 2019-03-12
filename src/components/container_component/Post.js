@@ -109,15 +109,19 @@ class Post extends Component {
       updated_at,
       timeline
     } = this.props.postsEntities[this.post_id]
-    const handleOpenPostEditor = this._handleOpenPostEditor.bind(null, { title, content }, this.post_id, created_at)
+    const handleOpenPostEditor = this._handleOpenPostEditor.bind(null, 
+      { title, content }, 
+      this.post_id, 
+      {user_id, author, avatar, created_at})
+    const display = user_id === this.props.self_id ? 'flow-root' : 'none'
     return (
       <>
         <StyledPost>
           <div className="post-container">
             <div>
               <h2>{title}</h2>              
-              <Dropdown>
-                <li onClick={handleOpenPostEditor} disabled={user_id === this.props.self_id}>编辑</li>
+              <Dropdown display={display}>
+                <li onClick={handleOpenPostEditor}>编辑</li>
               </Dropdown>
             </div>
             <div className="user">

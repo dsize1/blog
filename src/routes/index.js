@@ -22,6 +22,7 @@ import {
   handleSaveState
  } from '../actions/blog'
 import Styled from 'styled-components'
+import NotFound from './NotFound';
 
 const StyledHeader = Styled.header`
   border-bottom: .1rem solid #ccc;
@@ -286,6 +287,7 @@ class Routes extends Component {
             </StyledAside>
             <StyledSection>
               <Switch>
+                <Route exact path='/' render={() => (<Redirect to={`/home`} />)}/>
                 <Route path='/pixelpainter'component={PixelPainter}/>
                 <Route path='/masonry' component={Masonry}/>
                 <Route path='/cube' component={Cube}/>
@@ -294,8 +296,7 @@ class Routes extends Component {
                 <PrivateRoute path='/user/:user_id' condition={id} component={Blog}/>
                 <PrivateRoute path='/post/:post_id' condition={id} component={Post}/>
                 <Route path='/home' component={Home}/>
-                <Route exec path='/' render={() => (<Redirect to={`/home`} />)}/>
-                <Route render={() => 404}/>
+                <Route render={NotFound}/>
               </Switch>
             </StyledSection>
           </div>

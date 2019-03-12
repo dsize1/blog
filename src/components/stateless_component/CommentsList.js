@@ -19,7 +19,10 @@ const CommentsList = (props) => (
         updated_at
       } = props.comments.entities[comment_id]
       const _handleDelComment = props.handleDelComment.bind(null, comment_id)
-      const _handleStartUp = props.handleStartUp.bind(null, {content}, comment_id, created_at)
+      const _handleStartUp = props.handleStartUp.bind(null, 
+        { content }, 
+        comment_id, 
+        { user_id, author, avatar, created_at})
       return  (
         <li
           key={comment_id}

@@ -116,10 +116,7 @@ export const handleQueryHomePosts = (direction, limit = 15 ) => (dispatch, getSt
     .then(res => {
       if (res.data.length !== 0) {
         dispatchAll(dispatch, queryRequestSuccess(res, fetchStatus, unreadCount, direction, queryHomePostsSuccess))
-      } else {
-        dispatch(queryRequestFailure('nothing more'))
-        dispatch(queryTimelineNotingMore())
-      } 
+      }
     })
     .catch(err => {
       dispatch(queryRequestFailure(err))
@@ -147,9 +144,6 @@ export const handleQueryUserPosts = (user_id, direction, withUserinfo = false, l
         dispatchAll(dispatch, queryRequestSuccess(res, fetchStatus, unreadCount, direction, queryPostsWithEntitySuccess(user_id, res.userinfo)))
       } else if (res.data.length) {
         dispatchAll(dispatch, queryRequestSuccess(res, fetchStatus, unreadCount, direction, queryUserPostsSuccess(user_id)))
-      } else {
-        dispatch(queryRequestFailure('nothing more'))
-        dispatch(queryTimelineNotingMore())
       }
     }).catch(err => {
       dispatch(queryRequestFailure(err))
@@ -166,9 +160,6 @@ export const handleQueryComments = (post_id) => (dispatch, getState) => {
     .then(res => {
       if (res.data.length) {
         dispatchAll(dispatch, queryRequestSuccess(res, fetchStatus, unreadCount, 'bottom', queryCommentsSuccess(post_id))) 
-      } else {
-        dispatch(queryRequestFailure('nothing more'))
-        dispatch(queryTimelineNotingMore())
       }
     }).catch(err => {
       dispatch(queryRequestFailure(err))
@@ -261,22 +252,18 @@ export const handleDelComment = (post_id, id) => (dispatch, getState) => {
     })
 }
 
-export const handleUpdateComment = (handleShutDown, post_id, id, created_at) => (dispatch, getState) => {
+export const handleUpdateComment = (handleShutDown, post_id, id, rest) => (dispatch, getState) => {
   const { blog, router } = getState()
   const url = baseUrl + router.location.pathname
   const now = Date.now()
   if (!getFieldsValidate(blog.commentEditor.fields)) {
     return dispatch(publishRequestFailure({message: '填写有误', inputField: 'commentEditor'}))
   }
-  const {id: user_id, username: author, avatar} = blog.user
   const body = {
     id,
     post_id,
-    created_at,
     updated_at: now,
-    user_id,
-    author,
-    avatar,
+    ...rest,
     ...getFieldsValues(blog.commentEditor.fields)
   }  
   const headers = { "Content-Type": "application/json" }
@@ -292,21 +279,17 @@ export const handleUpdateComment = (handleShutDown, post_id, id, created_at) => 
     })
 }
 
-export const handleUpdatePost = (handleShutDown, self_id, id, created_at) => (dispatch, getState) => {
+export const handleUpdatePost = (handleShutDown, self_id, id, rest) => (dispatch, getState) => {
   const { blog } = getState()
   const url = baseUrl + `/user/${self_id}`
   const now = Date.now()
   if (!getFieldsValidate(blog.postEditor.fields)) {
     return dispatch(publishRequestFailure({message: '填写有误', inputField: 'postEditor'}))
   }
-  const {id: user_id, username: author, avatar} = blog.user
   const body = {
     id,
-    created_at,
     updated_at: now,
-    user_id,
-    author,
-    avatar,
+    ...rest,
     ...getFieldsValues(blog.postEditor.fields)
   }  
   const headers = { "Content-Type": "application/json" }

@@ -28,25 +28,28 @@ const StyledComment = styled.div`
     }  
 `
 
-const Comment = (props) => (
-  <StyledComment>
-    <div>
-      <User 
-        avatar={props.avatar}
-        user_id={props.user_id} 
-        username={props.author}/>
-      <Dropdown>
-        <li onClick={props.handleStartUp} disabled={props.user_id === props.self_id}>编辑</li>
-        <li onClick={props.handleDelComment} disabled={props.user_id === props.self_id}>删除</li>
-      </Dropdown>
-    </div>
-    <p className="content">{props.content}</p>
-    <Timestamp 
-      created_at={props.created_at}
-      updated_at={props.updated_at}
-      />
-  </StyledComment>
-)
+const Comment = (props) => {
+  const display = props.user_id === props.self_id ? 'flow-root' : 'none'
+  return (
+    <StyledComment>
+      <div>
+        <User 
+          avatar={props.avatar}
+          user_id={props.user_id} 
+          username={props.author}/>
+        <Dropdown display={display}>
+          <li onClick={props.handleStartUp}>编辑</li>
+          <li onClick={props.handleDelComment}>删除</li>
+        </Dropdown>
+      </div>
+      <p className="content">{props.content}</p>
+      <Timestamp 
+        created_at={props.created_at}
+        updated_at={props.updated_at}
+        />
+    </StyledComment>
+  )
+}
 
 Comment.propTypes = {
   avatar: PropTypes.string.isRequired,

@@ -14,8 +14,7 @@ const defaultState = {
     },
     isLoadingDirection: 'none',
     atEnd: false,
-    unreadCount: 0,
-    hasMore: true,
+    unreadCount: 0
   },
   entities: {
     posts: {
@@ -173,12 +172,6 @@ const blogReducer = (state, action) => {
       return produce(state, draft => {
 
         draft.homeTimeline.lastFetch.top = action.payload.lastFetch
-
-      })
-    case 'QUERY_NOTING_MORE':
-      return produce(state, draft => {
-
-        draft.homeTimeline.hasMore = false
 
       })
     case 'QUERY_REQUEST': 

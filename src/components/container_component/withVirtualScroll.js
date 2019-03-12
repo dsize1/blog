@@ -13,7 +13,7 @@ const withVirtualScroll = (WrappedList) => {
       }
       this._handleScroll = throttle(this._handleScroll.bind(this), 167)
       this._handleResize = this._handleResize.bind(this)
-      this._handleQueryRequest = throttle(this.props.handleQueryRequest, 500, {leading: true})
+      this._handleQueryRequest = throttle(this.props.handleQueryRequest, 5000, {leading: true})
     }
 
     _handleScroll () {
@@ -22,11 +22,10 @@ const withVirtualScroll = (WrappedList) => {
         let start = Math.floor(scrollTop / this.props.itemHeight) - 5
         let end = start + Math.ceil(state.screenHeight / this.props.itemHeight) + 10        
         if (start < 0) {
-          // this._handleQueryRequest('top')
           start = 0
         } 
         if (end > this.props.timeline.length) {
-          !this.props.loading && this.props.hasMore && this._handleQueryRequest('bottom')
+          !this.props.loading && this._handleQueryRequest('bottom')
           end = this.props.timeline.length
         }
         return {
@@ -59,11 +58,10 @@ const withVirtualScroll = (WrappedList) => {
         itemHeight,
         isLoadingDirection,
         loading,
-        posts,
-        hasMore,
+        posts
       } = this.props
-      const loadingTop = hasMore && isLoadingDirection === 'top' && loading
-      const loadingBottom = hasMore && isLoadingDirection === 'bottom' && loading
+      const loadingTop = isLoadingDirection === 'top' && loading
+      const loadingBottom = isLoadingDirection === 'bottom' && loading
       const paddingTopOffset = loadingBottom ? '2.5' : '0'
       const paddingBottomOffset = loadingTop ? '2.5' : '0'
       const currentTimeline = timeline.slice(this.state.start, this.state.end)
