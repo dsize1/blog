@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const multer = require('multer')
+const etag = require('etag')
 const upload = multer({dest: path.join(__dirname, './avatars')})
 const svgCaptcha = require('svg-captcha')
 
@@ -144,13 +145,15 @@ const app = express()
 //  static resource
 const staticOptions = {
   dotfiles: 'ignore',
-  etag: false,
-  extensions: ['htm', 'html'],
+  etag: true,
+  extensions: ['htm', 'html', 'js', 'css'],
   index: false,
-  maxAge: '1d',
   redirect: false,
+  lastModified: true,
+  maxAge: 86400000,
   setHeaders: function (res, path, stat) {
-    res.set('x-timestamp', Date.now())
+    res.set('Cache-Control', 'must-revalidate, max-age=86400000')
+    res.set('ETag', etag(stat))
   }
 }
 app.use(express.static(path.join(__dirname, 'build'), staticOptions))
