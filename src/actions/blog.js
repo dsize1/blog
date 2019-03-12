@@ -1,8 +1,8 @@
 import ajax from '../util/ajax'
 import { push } from 'connected-react-router'
 
-// const baseUrl = 'http://woai.lijinyan89.com/api'
-const baseUrl = 'http://localhost:8080/api'
+const baseUrl = 'http://woai.lijinyan89.com/api'
+//const baseUrl = 'http://localhost:8080/api'
 
 const firstQueryRequest = (lastFetch) => ({ type: 'FIRST_QUERY_REQUEST', payload: { lastFetch } })
 
