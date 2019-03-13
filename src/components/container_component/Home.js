@@ -2,10 +2,10 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import PostsList from '../stateless_component/PostsList'
 import Comet from './Comet'
-
 import { 
   handleQueryHomePosts,
   handleQueryNewPublish,
+  initLastFetch
 } from '../../actions/blog'
 
 class Home extends Component {
@@ -15,8 +15,14 @@ class Home extends Component {
   }
 
   componentDidMount () {
-    if (this.props.homeTimeline.timeline.length === 0) {
+    const timeline = this.props.homeTimeline.timeline
+    if (timeline.length === 0) {
       this.props.handleQueryHomePosts()
+    } else {
+      const posts = this.props.posts
+      const top = timeline[0]
+      const bottom = timeline[timeline.length-1]
+      this.props.initLastFetch(posts.entities[top].created_at, posts.entities[bottom].created_at)
     }
   }
 
@@ -24,15 +30,13 @@ class Home extends Component {
     const {
       timeline,
       loading,
-      isLoadingDirection,
-      hasMore
+      isLoadingDirection
     } = this.props.homeTimeline
     return (
       <div className='Home'>
         <Comet
           handleQueryNewPublish={this._handleQueryNewPublish}/>
         <PostsList
-          hasMore={hasMore}
           isLoadingDirection={isLoadingDirection}
           loading={loading}
           handleQueryRequest={this.props.handleQueryHomePosts}
@@ -52,6 +56,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   handleQueryHomePosts: (...args) => dispatch(handleQueryHomePosts(...args)),
   handleQueryNewPublish: (...args) => dispatch(handleQueryNewPublish(...args)),
+  initLastFetch: (...args) => dispatch(initLastFetch(...args))
 })
 
 const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(Home)

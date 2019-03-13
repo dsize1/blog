@@ -5,7 +5,8 @@ import PostsList from '../stateless_component/PostsList'
 import { 
   handleQueryUserPosts,
   handleInputChange,
-  handlePublishPost
+  handlePublishPost,
+  initLastFetch
  } from '../../actions/blog'
 
 class Blog extends Component {
@@ -21,7 +22,20 @@ class Blog extends Component {
       this._handleQueryRequest()
     } else if (!this.props.usersEntities.hasOwnProperty(this.user_id)) {
       this._handleQueryRequest(null, true)
+    } else {
+      const timeline = this.props.usersEntities[this.user_id].timeline
+      const top = timeline[0]
+      const bottom = timeline[timeline.length - 1]
+      const posts = this.props.posts
+      this.props.initLastFetch(posts.entities[top].created_at, posts.entities[bottom].created_at)
     }
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    if (!nextProps.usersEntities.hasOwnProperty(this.user_id)) {
+      return false
+    }
+    return true
   }
 
   render () {
@@ -35,10 +49,10 @@ class Blog extends Component {
     } = this.props
     const {
       loading,
-      isLoadingDirection,
-      hasMore
+      isLoadingDirection
     } = homeTimeline
-    const timeline = (usersEntities[this.user_id] && usersEntities[this.user_id].timeline) || []
+    const timeline = usersEntities[this.user_id] && usersEntities[this.user_id].timeline
+    if (!timeline) return (<></>)
     return (
       <div className='blog'>
         { this.user_id === this.self_id 
@@ -47,7 +61,6 @@ class Blog extends Component {
               handleSubmit={handlePublishPost}
               handleInputChange={handleInputChange}/> }
         <PostsList
-          hasMore={hasMore}
           isLoadingDirection={isLoadingDirection}
           loading={loading}
           itemHeight={250}
@@ -70,6 +83,7 @@ const mapDispatchToProps = (dispatch) => ({
   handleQueryUserPosts: (...args) => dispatch(handleQueryUserPosts(...args)),
   handlePublishPost: () => dispatch(handlePublishPost()),
   handleInputChange: (...args) => dispatch(handleInputChange(...args)),
+  initLastFetch: (...args) => dispatch(initLastFetch(...args))
 })
 const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(Blog)
 

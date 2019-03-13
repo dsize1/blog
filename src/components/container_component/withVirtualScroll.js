@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import throttle from 'lodash.throttle'
 import Loading from '../stateless_component/Loading'
 
