@@ -168,6 +168,12 @@ const blogReducer = (state, action) => {
     return defaultState
   }
   switch (action.type) {
+    case 'INIT_LAST_FETCH': 
+      return produce(state, draft => {
+
+        draft.homeTimeline.lastFetch = action.payload
+
+      })
     case 'FIRST_QUERY_REQUEST':
       return produce(state, draft => {
 
