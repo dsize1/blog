@@ -1,8 +1,8 @@
 import ajax from '../util/ajax'
 import { push } from 'connected-react-router'
 
-const baseUrl = 'http://woai.lijinyan89.com/api'
-//const baseUrl = 'http://localhost:8080/api'
+// const baseUrl = 'http://woai.lijinyan89.com/api'
+const baseUrl = 'http://localhost:8080/api'
 
 const firstQueryRequest = (lastFetch) => ({ type: 'FIRST_QUERY_REQUEST', payload: { lastFetch } })
 
@@ -90,6 +90,8 @@ const authentication = (dispatch, url, options) => {
 export const initInputField = (inputField, message) => ({ type: 'INPUTFIELD_INIT', payload: {inputField , message} })
 
 export const transmitValues = (inputField, entries) => ({ type: 'TRANSMIT_VALUES', payload: {inputField, entries}})
+
+export const initLastFetch = (top, bottom) => ({type: 'INIT_LAST_FETCH', payload: {top, bottom}})
 
 export const handleQueryNewPublish = (queryPosts, publishCount, fetchPublishCount) => () => {
   return queryPosts('top', publishCount).finally(() => {
