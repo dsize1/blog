@@ -258,7 +258,7 @@ class Routes extends Component {
                     to={asideLink}
                     className={'dropdown-menu'}>
                     <img alt='' 
-                      src={`http://localhost:8080/avatars/${asideAvatar}`}/>
+                      src={`http://woai.lijinyan89.com/avatars/${asideAvatar}`}/>
                   </Link>
                 </li>	
               </ul>
@@ -273,7 +273,7 @@ class Routes extends Component {
                 <Link to={asideLink}>
                   <div>{asideUsername}</div>
                   <img alt='' 
-                    src={`http://localhost:8080/avatars/${asideAvatar}`}/>
+                    src={`http://woai.lijinyan89.com/avatars/${asideAvatar}`}/>
                 </Link>
               </div>
               <div>
