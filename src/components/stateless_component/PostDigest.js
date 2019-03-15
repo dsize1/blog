@@ -51,7 +51,7 @@ const PostDigest = (props) => {
   const values = Object.values(entityMap)
   const src = values.length > 0 && values[0].data.url
   const img = src && (<img src={src} alt=''/>)
-  const len = src ? 200 : 300
+  const len = src ? 100 : 150
   content = content.length > len ? content.slice(0, len) + '...' : content
   return (
     <StyledPostDigest>
