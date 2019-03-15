@@ -2,9 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import { 
-  signup,
-  handleInputChange,
-  handleFileChange
+  signup
 } from '../../actions/blog'
 import Form from '../form/Form'
 import FormInput from '../form/FormInput'
@@ -21,9 +19,7 @@ const Signup = (props) => {
         btnTxt={'注册'}
         fieldsName={'authentication'}
         inputField={props.inputField}
-        handleSubmit={props.signup}
-        handleInputChange={props.handleInputChange}
-        handleFileChange={props.handleFileChange}>
+        handleSubmit={props.signup}>
         <FormInput
           requiredVisible={true} 
           name={'username'}/>
@@ -46,9 +42,7 @@ const mapStateToProps = (state) => ({
   self_id: state.blog.user.id
 })
 const mapDispatchToProps = (dispatch) => ({
-  signup: (event) => dispatch(signup()),
-  handleInputChange: (...args) => dispatch(handleInputChange(...args)),
-  handleFileChange: (...args) => dispatch(handleFileChange(...args))
+  signup: (event) => dispatch(signup())
 })
 
 const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(Signup)

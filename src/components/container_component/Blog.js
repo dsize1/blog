@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PostEditor from './PostEditor'
 import PostsList from '../stateless_component/PostsList'
+import Loading from '../stateless_component/Loading'
 import { 
   handleQueryUserPosts,
-  handleInputChange,
   handlePublishPost,
   initLastFetch
  } from '../../actions/blog'
@@ -43,7 +43,6 @@ class Blog extends Component {
       homeTimeline,
       inputField,
       handlePublishPost,
-      handleInputChange,
       usersEntities,
       posts
     } = this.props
@@ -52,18 +51,18 @@ class Blog extends Component {
       isLoadingDirection
     } = homeTimeline
     const timeline = usersEntities[this.user_id] && usersEntities[this.user_id].timeline
-    if (!timeline) return (<></>)
+    const ITEM_HEIGHT = 250
+    if (!timeline) return (<><Loading/></>)
     return (
       <div className='blog'>
         { this.user_id === this.self_id 
           && <PostEditor
               inputField={inputField}
-              handleSubmit={handlePublishPost}
-              handleInputChange={handleInputChange}/> }
+              handleSubmit={handlePublishPost}/> }
         <PostsList
           isLoadingDirection={isLoadingDirection}
           loading={loading}
-          itemHeight={250}
+          itemHeight={ITEM_HEIGHT}
           handleQueryRequest={this._handleQueryRequest}
           timeline={timeline}
           posts={posts}/>
@@ -82,7 +81,6 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   handleQueryUserPosts: (...args) => dispatch(handleQueryUserPosts(...args)),
   handlePublishPost: () => dispatch(handlePublishPost()),
-  handleInputChange: (...args) => dispatch(handleInputChange(...args)),
   initLastFetch: (...args) => dispatch(initLastFetch(...args))
 })
 const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(Blog)

@@ -7,11 +7,11 @@ const StyledFormFile = styled.div`
   width: 100%;
   background-color: transparent;
   display: grid;
-  grid-template-columns: 1fr 4fr;
+  grid-template-columns: 1fr 5fr;
 
     &>div:nth-of-type(1) {
       text-align: right;
-      padding: 0 10px;
+      padding: 0 .5rem;
       min-width: 20%;
     }
     &>div:nth-of-type(1)>span {

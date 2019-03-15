@@ -7,11 +7,11 @@ const StyleFormTextarea = styled.div`
   width: 100%;
   background-color: transparent;
   display: grid;
-  grid-template-columns: 1fr 4fr;
+  grid-template-columns: 1fr 5fr;
 
     &>div:nth-of-type(1) {
       text-align: right;
-      padding: 0 10px;
+      padding: 0 .5rem;
     }
     &>div:nth-of-type(1)>span {
       color: red;
@@ -25,7 +25,7 @@ const StyleFormTextarea = styled.div`
       &>div:nth-of-type(2)>div:nth-of-type(1)>div {
         text-align: center;
         max-width: 15%;
-        padding: 0 2px;
+        padding: 0 .1rem;
       }
       &>div:nth-of-type(2)>div:nth-of-type(1)>:nth-child(2) {
         max-width: 75%;

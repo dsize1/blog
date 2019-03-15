@@ -15,7 +15,7 @@ const StyledOuterlayer = styled.div`
       position: absolute;
       top: 40%;
       left: 50%;
-      width: 800px;
+      width: 850px;
       transform: translate(-50%, -50%);
       box-shadow: 0 1px 4px rgba(0,0,0,0.25);
       background: #fff;
@@ -40,11 +40,12 @@ const Outerlayer = (Inner) => {
       const display = alive ? 'block' : 'none'
       const pointerEvents = alive ? 'all' : 'none'
       const opacity = alive ? '1' : '0'
+      const zIndex = alive ? '999' : '-1'
       return (
         <StyledOuterlayer
           ref={outerlayer} 
           onClick={handleShutDown}
-          style={{display, pointerEvents, opacity}}>
+          style={{display, pointerEvents, opacity, zIndex}}>
           <div>
             <Inner {...rest}/>
           </div>

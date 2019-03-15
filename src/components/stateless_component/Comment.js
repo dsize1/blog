@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 import User from '../stateless_component/User'
+import BraftEditor from 'braft-editor'
 import Timestamp from '../stateless_component/Timestamp'
 import Dropdown from '../stateless_component/Dropdown'
 
@@ -42,7 +43,9 @@ const Comment = (props) => {
           <li onClick={props.handleDelComment}>删除</li>
         </Dropdown>
       </div>
-      <p className="content">{props.content}</p>
+      <p 
+        className="content"
+        dangerouslySetInnerHTML={{__html: BraftEditor.createEditorState(props.content).toHTML()}}></p>
       <Timestamp 
         created_at={props.created_at}
         updated_at={props.updated_at}

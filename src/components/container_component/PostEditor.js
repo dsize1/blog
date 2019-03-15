@@ -1,32 +1,40 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import styled from 'styled-components'
 import Form from '../form/Form'
-import FormTextarea from '../form/FormTextarea'
+import FormDraft from '../form/FormDraft'
 import FormInput from '../form/FormInput'
+
+const StyledPostEditor = styled.div`
+  & div.draft-editor .bf-content {
+    min-height: 6rem;
+    height: fit-content;
+    overflow: visible;
+  }
+`
 
 const PostEditor = (props) => {
   return (
-    <Form
-      btnTxt={'发布'}
-      fieldsName={'postEditor'}
-      inputField={props.inputField}
-      handleSubmit={props.handleSubmit}
-      handleInputChange={props.handleInputChange}>
-      <FormInput 
-        requiredVisible={false}
-        name={'title'} 
-        type={'text'}/>
-      <FormTextarea 
-        requiredVisible={false}
-        name={'content'}/>
-    </Form>
+    <StyledPostEditor>
+      <Form
+        btnTxt={'发布'}
+        fieldsName={'postEditor'}
+        inputField={props.inputField}
+        handleSubmit={props.handleSubmit}>
+        <FormInput 
+          requiredVisible={false}
+          name={'title'}/>
+        <FormDraft
+          requiredVisible={false}
+          name={'content'}/>
+      </Form>
+    </StyledPostEditor>
   )
 }
 
 PostEditor.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
-  inputField: PropTypes.object.isRequired,
-  handleInputChange: PropTypes.func.isRequired,
+  inputField: PropTypes.object.isRequired
 }
 
 export default PostEditor

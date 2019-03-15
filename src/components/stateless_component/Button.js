@@ -12,7 +12,7 @@ const StyledButton = styled.span`
     cursor: pointer;
     white-space: nowrap;
     line-height: 1.25rem;
-    padding: 5px;
+    padding: .25rem;
     outline: none;
   }
 

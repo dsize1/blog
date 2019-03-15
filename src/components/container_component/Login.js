@@ -2,8 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import { 
-  login,
-  handleInputChange
+  login
 } from '../../actions/blog'
 import Form from '../form/Form'
 import FormInput from '../form/FormInput'
@@ -19,8 +18,7 @@ const Login = (props) => {
         btnTxt={'登录'}
         fieldsName={'authentication'}
         inputField={props.inputField}
-        handleSubmit={props.login}
-        handleInputChange={props.handleInputChange}>
+        handleSubmit={props.login}>
         <FormInput 
           requiredVisible={true}
           name={'username'} />
@@ -40,8 +38,7 @@ const mapStateToProps = (state) => ({
   self_id: state.blog.user.id
 })
 const mapDispatchToProps = (dispatch) => ({
-  login: () => dispatch(login()),
-  handleInputChange: (...args) => dispatch(handleInputChange(...args))
+  login: () => dispatch(login())
 })
 
 const ConnectedComponent = connect(mapStateToProps, mapDispatchToProps)(Login)

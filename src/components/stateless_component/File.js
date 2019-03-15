@@ -12,7 +12,7 @@ const StyledFile = styled.div`
       line-height: 1.25rem;
       width: 100%;
       max-height: 1.25rem;
-      border-radius: 10px;
+      border-radius: .5rem;
       outline: none;
       border: 1px solid ${(props) => props.theme.color};
     }

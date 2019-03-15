@@ -13,14 +13,14 @@ const StyledTextarea = styled.div`
       width: 100%;
       min-height: 8rem;
       max-height: 8rem;
-      border-radius: 15px;
+      border-radius: .75rem;
       text-indent: 1em;
       outline: none;
       border: 1px solid ${(props) => props.theme.color};
     }
 
     &>textarea:focus {
-      border: 3px solid ${(props) => props.theme.color}
+      border: .1rem solid ${(props) => props.theme.color}
     }
 `
 

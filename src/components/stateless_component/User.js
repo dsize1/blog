@@ -44,7 +44,7 @@ const User = (props) => (
       <p className='id'>
         @{props.user_id.slice(-6)}
       </p>
-      <img alt='' src={`http://woai.lijinyan89.com/avatars/${props.avatar}`} />
+      <img alt='' src={`http://localhost:8080/avatars/${props.avatar}`} />
     </Link>
   </StyledUser>
 )

@@ -1,6 +1,13 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
+import { connect } from 'react-redux'
 import Button from '../stateless_component/Button'
+import {
+  handleInputChange,
+  handleFileChange,
+  handleDraftChange,
+  handleDraftBlur
+} from '../../actions/blog'
 
 const StyledForm = styled.form`
   background-color: ${(props) => props.theme.bgc};
@@ -38,29 +45,41 @@ class Form extends Component {
       btnTxt,
       handleSubmit,
       handleInputChange,
-      handleFileChange
+      handleFileChange,
+      handleDraftChange,
+      handleDraftBlur
     } = this.props
-    const validate = Object.values(inputField.fields).every(({validate, required}) => !required || validate)
+    const validate = inputField && Object.values(inputField.fields).every(({validate, required}) => !required || validate)
     const btnClassName= validate ? 'active' : 'disabled'
+    const message = !validate && inputField && inputField.message
     return (
       <StyledForm>
         { React.Children.map(children, (child) => {
           const { name } = {...child.props}
+          if (inputField === null) {
+            return React.cloneElement(child, {name})
+          }
+
           const { validator } = inputField.fields[name]
           let onChange
+          let onBlur
           if (inputField.fields[name].type === 'file') {
             onChange = handleFileChange.bind(this, fieldsName, name, validator)
+          } else if (inputField.fields[name].type === 'draft') {
+            onChange = handleDraftChange.bind(this, fieldsName, name)
+            onBlur = handleDraftBlur.bind(this, fieldsName, name, validator)
           } else {
             onChange = handleInputChange.bind(this, fieldsName, name, validator)
           }
           return React.cloneElement(child, {
             name,
             onChange,
+            onBlur,
             ...inputField.fields[name]
           })
         })}
         <div className={'submission'}>
-          <span>{!validate && inputField.message}</span>
+          <span>{message}</span>
           <Button 
             className={btnClassName}
             onClick={handleSubmit}
@@ -71,5 +90,12 @@ class Form extends Component {
   }
 }
 
-export default Form
+const mapDispatchToProps = (dispatch) => ({
+  handleFileChange: (...args) => dispatch(handleFileChange(...args)),
+  handleInputChange: (...args) => dispatch(handleInputChange(...args)),
+  handleDraftChange: (...args) => dispatch(handleDraftChange(...args)),
+  handleDraftBlur: (...args) => dispatch(handleDraftBlur(...args)),
+})
+
+export default connect(null, mapDispatchToProps)(Form)
 

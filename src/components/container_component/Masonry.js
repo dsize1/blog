@@ -35,7 +35,6 @@ const StyledMasonry = Styled.div`
 
 .masonry-wrapper .item>img:hover {
   transform: scale(1.2);
-  zoom: 1.StyledMasonry
 `
 
 const WrapWithDataComponent = (WrappedComponent) => {

@@ -3,7 +3,7 @@
 html {
   color:royalblue;
   box-sizing: border-box;
-  background-color: #e6ecf0;
+  background-color: #fff;
   font-size: 20px;
   line-height: 25px;
   min-width: 936px;
@@ -20,9 +20,24 @@ html {
     sans-serif;
 }
 
-@media (max-width: 1000px) {
+@media (min-width: 1000px) {
   html {
-    background-color: #fff;
+    background-color: #e6ecf0;
+    overflow-y: scroll;
+  }
+
+  :root {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  :root body {
+    position: absolute;
+  }
+
+  body {
+    width: 100vw;
+    overflow: hidden;
   }
 }
 

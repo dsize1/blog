@@ -1,16 +1,15 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
+import BraftEditor from 'braft-editor'
 import {
   handleQueryComments,
-  handleInputChange,
   handlePublishComment,
   handleDelComment,
   handleUpdateComment,
   handleUpdatePost,
   initInputField,
-  transmitValues,
-  initLastFetch
+  transmitValues
 } from '../../actions/blog'
 import CommentsList from '../stateless_component/CommentsList'
 import User from '../stateless_component/User'
@@ -114,6 +113,9 @@ class Post extends Component {
       this.post_id, 
       {user_id, author, avatar, created_at})
     const display = user_id === this.props.self_id ? 'flow-root' : 'none'
+    const updateCommentEditorFields = this.state.currentUpdateEditor === 'commentEditor' ? this.props.commentEditor : null
+    const UpdatePostEditorFields = this.state.currentUpdateEditor === 'postEditor' ? this.props.postEditor : null
+    const commentEditorFields = this.state.currentUpdateEditor === '' ? this.props.commentEditor : null
     return (
       <>
         <StyledPost>
@@ -127,15 +129,14 @@ class Post extends Component {
             <div className="user">
               <User avatar={avatar} user_id={user_id} username={author}/>
             </div>
-            <p>{content}</p>
+            <p dangerouslySetInnerHTML={{__html: BraftEditor.createEditorState(content).toHTML()}}></p>
             <div className="timeStamp">
               <Timestamp created_at={created_at} updated_at={updated_at}/>
             </div>
           </div>
           <CommentEditor
-            inputField={this.props.commentEditor}
-            handleSubmit={this._handlePublishComment}
-            handleInputChange={this.props.handleInputChange}/>
+            inputField={commentEditorFields}
+            handleSubmit={this._handlePublishComment}/>
           <CommentsList
             total={timeline.length}
             self_id={this.props.self_id}
@@ -148,16 +149,14 @@ class Post extends Component {
           outerlayer={this.setCommentEditorLayerRef}
           alive={this.state.currentUpdateEditor==='commentEditor'}
           handleShutDown={this._handleCloseCommentEditor}
-          inputField={this.props.commentEditor}
-          handleSubmit={this.state.handleUpdate}
-          handleInputChange={this.props.handleInputChange}/>
+          inputField={updateCommentEditorFields}
+          handleSubmit={this.state.handleUpdate}/>
         <UpdatePostEditor
           outerlayer={this.setPostEditorLayerRef}
           alive={this.state.currentUpdateEditor==='postEditor'}
           handleShutDown={this._handleClosePostEditor}
-          inputField={this.props.postEditor}
-          handleSubmit={this.state.handleUpdate}
-          handleInputChange={this.props.handleInputChange}/>
+          inputField = {UpdatePostEditorFields}
+          handleSubmit={this.state.handleUpdate}/>
       </>
     )
   }
@@ -171,7 +170,6 @@ const mapStateToProps = (state) => ({
   self_id: state.blog.user.id
 })
 const mapDispatchToProps = (dispatch) => ({
-  handleInputChange: (...args) => dispatch(handleInputChange(...args)),
   handleQueryRequest: (...args) => dispatch(handleQueryComments(...args)),
   handleUpdateComment: (...args) => dispatch(handleUpdateComment(...args)),
   handleUpdatePost: (...args) => dispatch(handleUpdatePost(...args)),

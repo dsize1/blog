@@ -1,4 +1,5 @@
 import produce from 'immer'
+import BraftEditor from 'braft-editor'
 
 const defaultState = {
   homeTimeline: {
@@ -97,7 +98,7 @@ const defaultState = {
         validate: false,
         validator: {
           pattern: '^\\S+$',
-          message: '验证码不能为空'
+          message: '验证码不能为空。'
         }
       },
     }
@@ -118,21 +119,24 @@ const defaultState = {
         validate: false,
         validator: {
           pattern: '^[\\S\\s]{6,}$',
-          message: '标题不可少于6个字'
+          message: '标题不可少于6个字。'
         }
       },
       content: {
         required: true,
+        type: 'draft',
         name: 'content',
         prefix: '',
         suffix: '',
-        value: '',
+        value: BraftEditor.createEditorState(null),
+        controls: ['bold', 'italic', 'underline', 'text-color', 'separator', 'link', 'media', 'emoji', 'blockquote', 'code', 'clear', 'undo', 'redo'],
         help: '',
         error: '',
         validate: false,
         validator: {
-          pattern: '^[\\S\\s]{8,150}$',
-          message: '内容不可少于8个字或者多于了150个字'
+          pattern: '(?<=,"text":)(.)*?(?=,"type":"unstyled")',
+          minLength: 8,
+          message: '内容不可少于8个字,上传图片不要大于50kb。',
         }
       }
     }
@@ -143,16 +147,21 @@ const defaultState = {
     fields: {
       content: {
         required: true,
+        type: 'draft',
         name: 'content',
         prefix: '',
         suffix: '',
-        value: '',
+        value: BraftEditor.createEditorState(null),
+        controls: ['italic', 'underline', 'text-color', 'emoji', 'clear'],
         help: '',
         error: '',
         validate: false,
         validator: {
-          pattern: '^[\\S\\s]{8,150}$',
-          message: '评论字数不够或者多于了150个字。'
+          pattern: '(?<=,"text":)(.)*?(?=,"type":"unstyled")',
+          minLength: 8,
+          maxLength: 150,
+          maxLine: 6,
+          message: '评论字数不够或者篇幅过长(须150个字以内)。'
         }
       }
     }
@@ -442,11 +451,12 @@ const blogReducer = (state, action) => {
       return produce(state, draft => {
         
         const { inputField, message} = action.payload
+        const fields = state[inputField].fields
         if (message) {
           draft[inputField].message = ''
         }
-        Object.keys(state[inputField].fields).forEach(field => {
-          draft[inputField].fields[field].value = ''
+        Object.keys(fields).forEach(field => {
+          draft[inputField].fields[field].value = fields[field].type !== 'draft' ? '' : BraftEditor.createEditorState(null)
           draft[inputField].fields[field].error = ''
           draft[inputField].fields[field].prefix = ''
           draft[inputField].fields[field].suffix = ''
@@ -459,9 +469,8 @@ const blogReducer = (state, action) => {
 
         const { inputField, entries } = action.payload
         Object.entries(entries).forEach(([field, value]) => {
-          draft[inputField].fields[field].value = value
-          if (field !== 'content') 
-            draft[inputField].fields[field].validate = true
+          draft[inputField].fields[field].value = field !== 'content' ? value : BraftEditor.createEditorState(value)
+          draft[inputField].fields[field].validate = field !== 'content' ? true : false
         })
 
       })

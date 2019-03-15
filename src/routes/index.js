@@ -227,6 +227,7 @@ class Routes extends Component {
 
   componentWillUnmount () {
     document.removeEventListener('scroll', this._handleScroll)
+    window.removeEventListener('beforeunload', this.props.handleSaveState)
   }
 
   render () {
@@ -243,7 +244,7 @@ class Routes extends Component {
       <StyledRoutes>
         <StyledHeader role='banner'>
           <div className='header-inner'>
-            <Link to='/home'><h1>成的小站</h1></Link>
+            <Link to='/home'><h1>Cheng的小站</h1></Link>
             <nav>
               <ul>
                 <li><Link to='/home'>首页</Link></li>
@@ -257,7 +258,7 @@ class Routes extends Component {
                     to={asideLink}
                     className={'dropdown-menu'}>
                     <img alt='' 
-                      src={`http://woai.lijinyan89.com/avatars/${asideAvatar}`}/>
+                      src={`http://localhost:8080/avatars/${asideAvatar}`}/>
                   </Link>
                 </li>	
               </ul>
@@ -272,7 +273,7 @@ class Routes extends Component {
                 <Link to={asideLink}>
                   <div>{asideUsername}</div>
                   <img alt='' 
-                    src={`http://woai.lijinyan89.com/avatars/${asideAvatar}`}/>
+                    src={`http://localhost:8080/avatars/${asideAvatar}`}/>
                 </Link>
               </div>
               <div>

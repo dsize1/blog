@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import BraftEditor from 'braft-editor'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import User from '../stateless_component/User'
@@ -14,19 +15,44 @@ const StyledPostDigest = styled.div`
     background-color: #eee;
   }
 
-    &>div:nth-of-type(2)>a>P:nth-of-type(1) {
+    &>div:nth-of-type(2)>P{
       font-size: 1.5rem;
       line-height: 2.5rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
-    &>div:nth-of-type(2)>a>P:nth-of-type(2) {
+    &>div:nth-of-type(2)>a {
       min-height: 6rem;
       max-height: 6rem;
-      word-wrap: break-word;
-      overflow: auto;
+      display: flex;
+      flex-wrap: nowrap;
+    }
+    &>div:nth-of-type(2)>a>img {
+      width: 9.5rem;
+      height: 6rem;
+      object-fit: cover;
+      margin-right: 1rem;
+    }
+    &>div:nth-of-type(2)>a>p {
+      flex-grow: 1;
+      word-break: break-all;
+      overflow: hidden;
     }
 `
 
 const PostDigest = (props) => {
+  const { blocks, entityMap } = BraftEditor.createEditorState(props.content).toRAW(true)
+  let content = blocks.reduce((re, it) => {
+    if (it.type === 'unstyled')
+      re += it.text
+    return re
+  }, '')
+  const values = Object.values(entityMap)
+  const src = values.length > 0 && values[0].data.url
+  const img = src && (<img src={src} alt=''/>)
+  const len = src ? 200 : 300
+  content = content.length > len ? content.slice(0, len) + '...' : content
   return (
     <StyledPostDigest>
       <User
@@ -34,9 +60,10 @@ const PostDigest = (props) => {
         user_id={props.user_id}
         username={props.author}/>
       <div>
+        <p>{props.title}</p>
         <Link to={ `/post/${props.post_id}` }>
-          <p>{props.title}</p>
-          <p>{props.content}</p>
+          { img }
+          <p>{ content }</p>
         </Link>
       </div>
       <Timestamp

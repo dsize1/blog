@@ -11,14 +11,14 @@ const StyledInput = styled.div`
       line-height: 1.25rem;
       width: 100%;
       max-height: 1.25rem;
-      border-radius: 10px;
+      border-radius: .5rem;
       text-indent: 1em;
       outline: none;
       border: 1px solid ${(props) => props.theme.color};
     }
 
     &>input:focus {
-      border: 3px solid ${(props) => props.theme.color}
+      border: .1rem solid ${(props) => props.theme.color}
     }
 `
 

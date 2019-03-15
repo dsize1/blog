@@ -10,8 +10,6 @@ const queryRequest = (direction) => ({ type: 'QUERY_REQUEST', payload: { directi
 
 const queryRequestFailure = (error) => ({ type: 'QUERY_REQUEST_FAILURE', payload: { error } })
 
-const queryTimelineNotingMore = () => ({ type: 'QUERY_NOTING_MORE'})
-
 const timelineStateQueryUpdate = (payload) => ({ type: 'TIMELINESTATE_QUERY_UPDATED', payload })
 
 const queryHomePostsSuccess = (payload) => ({ type: 'QUERY_HOME_POSTS_SUCCESS', payload })
@@ -50,7 +48,9 @@ const updateRequestFailure = (payload) => ({ type: 'UPDATE_REQUEST_FAILURE', pay
 
 const getFieldsValidate = (fields) => Object.values(fields).every(({required, validate}) => !required || validate)
 
-const getFieldsValues = (fields) => Object.values(fields).reduce((res, {name, value}) => {
+const getFieldsValues = (fields) => Object.values(fields).reduce((res, {type, name, value}) => {
+  if (type === 'draft')
+    value = value.toRAW()
   res[name] = value
   return res
 }, {})
@@ -373,7 +373,45 @@ export const handleFileChange = (inputField, field, { pattern, message }, event)
       error: message
     }
   })
+}
 
+export const handleDraftChange = (inputField, field, editorValue) => (dispatch, getSate) => {
+  dispatch({
+    type: 'INPUTFIELD_CHANGE',
+    inputField,
+    field,
+    data: {
+      value: editorValue
+    }
+  })
+}
+
+export const handleDraftBlur = (inputField, field, { pattern, minLength = 0, maxLength = Infinity, maxLine = Infinity, message }) => (dispatch, getState) => {
+  const { blog } = getState()
+  const value = blog[inputField].fields[field].value.toRAW()
+  //  记得global 避免死循环
+  const regExp = pattern && new RegExp(pattern, 'g')
+  let result = false
+  let textLength = 0
+  let line = 0
+  let execArr = null
+  while (regExp && (execArr = regExp.exec(value)) !== null) {
+    textLength += execArr[0].length - 2
+    line++
+  }
+  if (textLength > minLength && textLength <= maxLength && line <= maxLine) {
+    result = true
+    message = ''
+  }
+  dispatch({
+    type: 'INPUTFIELD_CHANGE',
+    inputField,
+    field,
+    data: {
+      validate: result,
+      error: message
+    }
+  })
 }
 
 export const handleInitTimeline = () => ({ type: 'TIMELINESTATE_INIT'})
