@@ -25,8 +25,7 @@ class Comet extends Component {
       publishCount: 0,
       xhr: null
     }
-    this.baseUrl = 'http://localhost:8080/api'
-    // this.baseUrl = 'http://woai.lijinyan89.com/api'
+    this.baseUrl = 'http://woai.lijinyan89.com/api'
     this._fetchPublishCount = this._fetchPublishCount.bind(this)
     this._onload = this._onload.bind(this)
     this._fetchAbort = this._fetchAbort.bind(this)
