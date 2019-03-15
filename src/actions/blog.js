@@ -388,18 +388,16 @@ export const handleDraftChange = (inputField, field, editorValue) => (dispatch, 
 
 export const handleDraftBlur = (inputField, field, { pattern, minLength = 0, maxLength = Infinity, maxLine = Infinity, message }) => (dispatch, getState) => {
   const { blog } = getState()
-  const value = blog[inputField].fields[field].value.toRAW()
-  //  记得global 避免死循环
-  const regExp = pattern && new RegExp(pattern, 'g')
+  const { blocks } = blog[inputField].fields[field].value.toRAW(true)
+  let content = blocks.reduce((re, it) => {
+    if (it.type === 'unstyled')
+      re += it.text
+    return re
+  }, '')
   let result = false
-  let textLength = 0
-  let line = 0
-  let execArr = null
-  while (regExp && (execArr = regExp.exec(value)) !== null) {
-    textLength += execArr[0].length - 2
-    line++
-  }
-  if (textLength > minLength && textLength <= maxLength && line <= maxLine) {
+  let textLength = content.length
+  let line = blocks.length
+  if (textLength >= minLength && textLength <= maxLength && line <= maxLine) {
     result = true
     message = ''
   }
