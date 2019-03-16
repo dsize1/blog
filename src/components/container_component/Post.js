@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
 import BraftEditor from 'braft-editor'
+import 'braft-editor/dist/index.css'
+import 'braft-extensions/dist/code-highlighter.css'
+import CodeHighlighter from 'braft-extensions/dist/code-highlighter'
 import {
   handleQueryComments,
   handlePublishComment,
@@ -18,6 +21,8 @@ import Timestamp from '../stateless_component/Timestamp'
 import CommentEditor from './CommentEditor'
 import UpdateCommentEditor from './UpdateCommentEditor'
 import UpdatePostEditor from './UpdatePostEditor'
+
+BraftEditor.use(CodeHighlighter())
 
 const StyledPost = styled.div`
     &>.post-container {
@@ -39,8 +44,17 @@ const StyledPost = styled.div`
         max-height: 5rem;
       }
 
-      &>.post-container>.user+p {
-        word-wrap: break-word;
+      &>.post-container .bf-controlbar {
+        display: none;
+        pointer-events: none;
+        height: 0;
+        opacity: 0;
+      }
+
+      &>.post-container .bf-content {
+        border: .1rem solid;
+        box-sizing: border-box;
+        border-radius: .5rem;
       }
 `
 
@@ -129,7 +143,9 @@ class Post extends Component {
             <div className="user">
               <User avatar={avatar} user_id={user_id} username={author}/>
             </div>
-            <p dangerouslySetInnerHTML={{__html: BraftEditor.createEditorState(content).toHTML()}}></p>
+            <BraftEditor
+              readOnly={true} 
+              defaultValue={BraftEditor.createEditorState(content)}/>
             <div className="timeStamp">
               <Timestamp created_at={created_at} updated_at={updated_at}/>
             </div>
