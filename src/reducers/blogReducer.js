@@ -172,7 +172,17 @@ const blogReducer = (state, action) => {
   if (!state) {
     const stateStorage = sessionStorage.getItem('stateStorage')
     if (stateStorage) {
-      return JSON.parse(stateStorage)
+      const { 
+        authentication,
+        postEditor,
+        commentEditor,
+      } = defaultState
+      return {
+        authentication,
+        postEditor,
+        commentEditor,
+        ...JSON.parse(stateStorage)
+      }
     }
     return defaultState
   }
@@ -489,18 +499,10 @@ const blogReducer = (state, action) => {
         entities,
         user
       } = state
-      const {
-        authentication,
-        postEditor,
-        commentEditor
-      } = defaultState
       sessionStorage.setItem('stateStorage', JSON.stringify({
         homeTimeline,
         entities,
-        user,
-        authentication,
-        postEditor,
-        commentEditor
+        user
       }))
       return state  
     case 'TIMELINESTATE_INIT':
