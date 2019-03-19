@@ -9,7 +9,7 @@ const etag = require('etag')
 const upload = multer({dest: path.join(__dirname, './avatars')})
 const svgCaptcha = require('svg-captcha')
 
-const port = 80
+const port = 8080
 
 const connectToMongoDB = () => {
 
@@ -492,7 +492,7 @@ app.route('/api/post/:postid')
   })
 
 app.get('/api/comet', async (req, res, next) => {
-  console.log(req.query.l, req.query.n)
+  console.log(req.query.l, req.query.n, req.query.t)
   setTimeout(async () => {
     const result = await Post.getPosts('t', req.query.l, Number.parseInt(req.query.n))
     let publishCount
@@ -503,7 +503,7 @@ app.get('/api/comet', async (req, res, next) => {
     }
     console.log(result)
     res.json({data: {publishCount}})
-  }, 45 * 1000)
+  }, parseInt(req.query.t))
 })
 
 
