@@ -7,22 +7,37 @@ import {
   withRouter,
   Redirect
 } from 'react-router-dom'
+import { pro_avatars} from '../url'
+import Loadable from 'react-loadable'
 import throttle from 'lodash.throttle'
 import AuthenticationRoute from './AuthenticationRoute'
 import AccessDenied from './AccessDenied'
 import Blog from '../components/container_component/Blog'
-import PixelPainter from '../components/container_component/PixelPainter'
-import Masonry from '../components/container_component/Masonry'
-import Cube from '../components/container_component/Cube'
 import Post from '../components/container_component/Post'
 import Home from '../components/container_component/Home'
 import PrivateRoute from './PrivateRoute'
+import Loading from '../components/stateless_component/Loading'
 import { 
   handleSignout,
   handleSaveState
  } from '../actions/blog'
 import Styled from 'styled-components'
-import NotFound from './NotFound';
+import NotFound from './NotFound'
+
+const PixelPainter = Loadable({
+  loader: () => import('../components/container_component/PixelPainter'),
+  loading: () => (<Loading visible={true}/>),
+})
+
+const Cube  = Loadable({
+  loader: () => import('../components/container_component/Cube'),
+  loading: () => (<Loading visible={true}/>),
+})
+
+const Masonry = Loadable({
+  loader: () => import('../components/container_component/Masonry'),
+  loading: () => (<Loading visible={true}/>),
+})
 
 const StyledHeader = Styled.header`
   border-bottom: .1rem solid #ccc;
@@ -258,7 +273,7 @@ class Routes extends Component {
                     to={asideLink}
                     className={'dropdown-menu'}>
                     <img alt='' 
-                      src={`http://woai.lijinyan89.com/avatars/${asideAvatar}`}/>
+                      src={`${pro_avatars}/${asideAvatar}`}/>
                   </Link>
                 </li>	
               </ul>
@@ -273,7 +288,7 @@ class Routes extends Component {
                 <Link to={asideLink}>
                   <div>{asideUsername}</div>
                   <img alt='' 
-                    src={`http://woai.lijinyan89.com/avatars/${asideAvatar}`}/>
+                    src={`${pro_avatars}/${asideAvatar}`}/>
                 </Link>
               </div>
               <div>

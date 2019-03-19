@@ -2,28 +2,32 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 const Img = (props) => {
-  const id = props.id
-  const src = props.src
-  const width = props.width
-  const height = props.height
+  const {
+    id,
+    src,
+    width,
+    height,
+    handleClick
+  } = props
   return (
-    <div  
+    <div
       className={'item'} data-id={`${id}`}
       style={{width: `${width*200/height}px`, flexGrow: `${width*200/height}`}}>
       <div style={{paddingBottom: `${height/width*100}%`}}></div>
-      <img 
+      <img
+        onClick={handleClick} 
         src={`https:${src}`}
-        alt='' 
-      />
+        alt='' />
     </div>
   )
 }
 
 Img.propTypes = {
-  id: PropTypes.number.isRequired,
+  id: PropTypes.string.isRequired,
   src: PropTypes.string.isRequired,
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
+  handleClick: PropTypes.func.isRequired
 }
 
 export default Img

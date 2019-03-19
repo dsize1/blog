@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
+import { pro_api } from '../../url'
 
 const StyledComet = styled.div`
   width: 100%;
@@ -23,55 +24,43 @@ class Comet extends Component {
     super(props)
     this.state = {
       publishCount: 0,
-      xhr: null
+      xhr: null,
+      turnon: true,
     }
-    this.baseUrl = 'http://woai.lijinyan89.com/api'
-    this._fetchPublishCount = this._fetchPublishCount.bind(this)
-    this._onload = this._onload.bind(this)
-    this._fetchAbort = this._fetchAbort.bind(this)
-    this._initPublishCount = this._initPublishCount.bind(this)
+    this.baseUrl = pro_api
     this._handleQueryNewPublish = this._handleQueryNewPublish.bind(this, this.props.handleQueryNewPublish)
   }
 
-  _fetchPublishCount () {
-    if (this.state.xhr) {
-      if (this.state.xhr.readyState !== 0) this.state.xhr.abort()
-      this.setState({
-        xhr: null
-      })
-    }
+  _fetchPublishCount = (timeout = '&t=45000') => {
     const xhr = new XMLHttpRequest()
     const lastFetch = this.props.homeTimeline.lastFetch.top || Date.now()
-    const url = this.baseUrl + `/comet?l=${lastFetch}&n=20`
+    const url = this.baseUrl + `/comet?l=${lastFetch}&n=20` + timeout
     xhr.open('GET', url)
-    xhr.timeout = 60 * 1000
+    xhr.timeout = 60e3
     xhr.send(null)
 
     xhr.onload = this._onload
-    xhr.onerror = this._fetchPublishCount
-    xhr.ontimeout = this._fetchPublishCount
+    xhr.onerror = this._fetchAbort
+    xhr.ontimeout = this._fetchAbort
     this.setState({
       xhr
     })
   }
 
-  _onload () {
-    if (this.state.xhr.status < 400) {
-      this.setState((state) => {
-        const count = JSON.parse(state.xhr.responseText).data.publishCount
-        if (count < 20) {
-          this._fetchPublishCount()
-        }
-        return {
-          publishCount: count
-        }
-      })
-    } else {
-      this._fetchPublishCount()
-    }
+  _onload = () => {    
+    this.setState((state) => {
+      let count = state.publishCount
+      if (this.state.xhr.status < 400) {
+        count = JSON.parse(state.xhr.responseText).data.publishCount
+      }
+      return {
+        xhr: null,
+        publishCount: count
+      }
+    })
   }
 
-  _fetchAbort () {
+  _fetchAbort = () => {
     this.setState((state) => {
       if (state.xhr && state.xhr.readyState !==0)
         state.xhr.abort()
@@ -81,20 +70,34 @@ class Comet extends Component {
     })
   }
 
-  _initPublishCount () {
+  _initPublishCount = () => {
     this.setState({
       publishCount: 0
+    })
+  }
+
+  _cometSwitch = (turnon) => {
+    this.setState({
+      turnon
     })
   }
 
   _handleQueryNewPublish (queryNewPublish) {
     this._fetchAbort()
     this._initPublishCount()
-    queryNewPublish(this.state.publishCount, this._fetchPublishCount)
+    this._cometSwitch(false)
+    queryNewPublish(this.state.publishCount, this._cometSwitch)
   }
 
   componentDidMount () {
-    this._fetchPublishCount()
+    this._fetchPublishCount('&t=5000')
+  }
+
+  componentDidUpdate () {
+    const { xhr, turnon, publishCount} = this.state
+    if (xhr === null && turnon === true && publishCount < 20) {
+      this._fetchPublishCount()
+    }
   }
 
   componentWillUnmount () {

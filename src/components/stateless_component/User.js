@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import { pro_avatars } from '../../url'
 
 const StyledUser = styled.div`
   position: relative;
@@ -44,7 +45,7 @@ const User = (props) => (
       <p className='id'>
         @{props.user_id.slice(-6)}
       </p>
-      <img alt='' src={`http://woai.linjinyan89.com/avatars/${props.avatar}`} />
+      <img alt='' src={`${pro_avatars}/${props.avatar}`} />
     </Link>
   </StyledUser>
 )

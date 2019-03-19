@@ -1,8 +1,8 @@
 import ajax from '../util/ajax'
+import { pro_api } from '../url'
 import { push } from 'connected-react-router'
 
-const baseUrl = 'http://woai.lijinyan89.com/api'
-//const baseUrl = 'http://localhost:8080/api'
+const baseUrl = pro_api
 
 const firstQueryRequest = (lastFetch) => ({ type: 'FIRST_QUERY_REQUEST', payload: { lastFetch } })
 
@@ -93,9 +93,9 @@ export const transmitValues = (inputField, entries) => ({ type: 'TRANSMIT_VALUES
 
 export const initLastFetch = (top, bottom) => ({type: 'INIT_LAST_FETCH', payload: {top, bottom}})
 
-export const handleQueryNewPublish = (queryPosts, publishCount, fetchPublishCount) => () => {
+export const handleQueryNewPublish = (queryPosts, publishCount, cometSwitch) => () => {
   return queryPosts('top', publishCount).finally(() => {
-    fetchPublishCount()
+    cometSwitch(true)
   })
 }
 
@@ -397,7 +397,7 @@ export const handleDraftBlur = (inputField, field, { pattern, minLength = 0, max
   let result = false
   let textLength = content.length
   let line = blocks.length
-  if (textLength >= minLength && textLength <= maxLength && line <= maxLine) {
+  if (textLength > minLength && textLength <= maxLength && line <= maxLine) {
     result = true
     message = ''
   }

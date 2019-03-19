@@ -33,8 +33,8 @@ const PostEditor = (props) => {
 }
 
 PostEditor.propTypes = {
-  handleSubmit: PropTypes.func.isRequired,
-  inputField: PropTypes.object.isRequired
+  handleSubmit: PropTypes.func,
+  inputField: PropTypes.object
 }
 
 export default PostEditor

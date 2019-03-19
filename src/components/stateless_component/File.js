@@ -39,10 +39,10 @@ const File = (props) => {
 }
 
 File.propTypes = {
-  type: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  type: PropTypes.string,
+  onChange: PropTypes.func,
   name: PropTypes.string.isRequired,
-  accept: PropTypes.string.isRequired
+  accept: PropTypes.string
 }
 
 export default File

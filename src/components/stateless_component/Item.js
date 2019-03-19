@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import bgi from '../../cube.png'
 
 const Item = (props) => {
   const size = props.size

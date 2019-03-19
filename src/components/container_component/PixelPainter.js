@@ -259,7 +259,7 @@ class PixelPainter extends Component {
   }
 
   componentDidMount () {
-    const ws = io('http://woai.lijinyan89.com:8082/')
+    const ws = io('https://www.chengcici.info/pixelpainter')
     this.ws = ws
 
     const DrawingBoard = this.DrawingBoard

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 
 const StyledOuterlayer = styled.div`
   width: 100%;
-  background-color: #0006;
+  background-color: #999c;
   position: fixed;
   top: 0;
   bottom: 0;
@@ -23,36 +23,35 @@ const StyledOuterlayer = styled.div`
     }
 
 `
-const Outerlayer = (Inner) => {
-  return class extends Component {
-    static propTypes = {
-      alive: PropTypes.bool.isRequired,
-      handleShutDown: PropTypes.func.isRequired,
-      outerlayer: PropTypes.func.isRequired
-    }
-    render () { 
-      const {
-        alive,
-        handleShutDown,
-        outerlayer,
-        ...rest
-      } = this.props
-      const display = alive ? 'block' : 'none'
-      const pointerEvents = alive ? 'all' : 'none'
-      const opacity = alive ? '1' : '0'
-      const zIndex = alive ? '999' : '-1'
-      return (
-        <StyledOuterlayer
-          ref={outerlayer} 
-          onClick={handleShutDown}
-          style={{display, pointerEvents, opacity, zIndex}}>
-          <div>
-            <Inner {...rest}/>
-          </div>
-        </StyledOuterlayer>
-      )
-    }
+class Outerlayer extends Component {
+  static propTypes = {
+    alive: PropTypes.bool.isRequired,
+    handleShutDown: PropTypes.func.isRequired,
+    outerlayer: PropTypes.func.isRequired
+  }
+  render () { 
+    const {
+      alive,
+      handleShutDown,
+      outerlayer,
+      ...rest
+    } = this.props
+    const display = alive ? 'block' : 'none'
+    const pointerEvents = alive ? 'all' : 'none'
+    const opacity = alive ? '1' : '0'
+    const zIndex = alive ? '999' : '-1'
+    return (
+      <StyledOuterlayer
+        ref={outerlayer} 
+        onClick={handleShutDown}
+        style={{display, pointerEvents, opacity, zIndex}}>
+        <div>
+          {this.props.render(rest)}
+        </div>
+      </StyledOuterlayer>
+    )
   }
 }
+
 
 export default Outerlayer

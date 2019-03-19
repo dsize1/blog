@@ -1,8 +1,9 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Styled from 'styled-components'
 import { connect } from 'react-redux'
-import Wrapper from '../stateless_component/Wrapper.js'
+import Outerlayer from './Outerlayer'
+import Images from '../stateless_component/Images.js'
 import {getImageSrc, fetchImageSrc} from '../../actions/masonry'
 import debounce from 'lodash.debounce'
 
@@ -49,29 +50,35 @@ const WrapWithDataComponent = (WrappedComponent) => {
 
     constructor (props) {
       super(props)
-      this.handPageScroll = debounce(this.handPageScroll.bind(this), 0.5 * 1000)
-      this.handVisibleImage = debounce(this.handVisibleImage.bind(this), 0.05 * 1000)
+      this.state = {
+        outerlayerSrc: ''
+      }
+      this.setOuterlayer = el => this.outerlayer = el
+      this._getOuterlayerSrc = this._getOuterlayerSrc.bind(this)
+      this._handleCloseOuterlayer = this._handleCloseOuterlayer.bind(this)
+      this._handPageScroll = debounce(this._handPageScroll.bind(this), 0.5 * 1000)
+      this._handVisibleImage = debounce(this._handVisibleImage.bind(this), 0.05 * 1000)
     }
 
     componentWillMount () {
       this.props.fetchImageSrc()
-      document.addEventListener('scroll', this.handPageScroll)
-      document.addEventListener('scroll', this.handVisibleImage)
+      document.addEventListener('scroll', this._handPageScroll)
+      document.addEventListener('scroll', this._handVisibleImage)
     }
 
     componentWillUnmount () {
-      document.removeEventListener('scroll', this.handPageScroll)
-      document.removeEventListener('scroll', this.handVisibleImage)
+      document.removeEventListener('scroll', this._handPageScroll)
+      document.removeEventListener('scroll', this._handVisibleImage)
     }
 
-    handVisibleImage (event) {
+    _handVisibleImage (event) {
       const imgs = document.querySelector('.masonry-wrapper').children
       for(const img of imgs) {
         const position = img.getClientRects()[0]
         const top = position.top
         const bottom = position.bottom
         const screenHeight = document.documentElement.clientHeight
-        if (top > -800 && bottom < screenHeight + 800) {
+        if (top > -1000 && bottom < screenHeight + 1000) {
           img.style.visibility = 'visible'
         } else {
           img.style.visibility = 'hidden'
@@ -79,7 +86,7 @@ const WrapWithDataComponent = (WrappedComponent) => {
       }
     }
 
-    handPageScroll (event) {
+    _handPageScroll (event) {
       const screenHeight = document.documentElement.clientHeight
       if (!this.props.Loading 
         && this.props.cache.length !== 0 
@@ -88,10 +95,39 @@ const WrapWithDataComponent = (WrappedComponent) => {
       }
     }
 
+    _getOuterlayerSrc (src) {
+      this.setState({
+        outerlayerSrc: src
+      })
+    }
+
+    _handleCloseOuterlayer (event) {
+      if (event.target === this.outerlayer) {
+        this.setState({
+          outerlayerSrc: ''
+        })
+      }
+    }
+
     render () {
       return (
         <StyledMasonry>
-          <WrappedComponent imgs={this.props.display} />
+          <WrappedComponent 
+            imgs={this.props.display} 
+            handleClick={this._getOuterlayerSrc}/>
+          <Outerlayer 
+            alive={this.state.outerlayerSrc !== ''}
+            outerlayer={this.setOuterlayer}
+            handleShutDown={this._handleCloseOuterlayer}
+            render={() => (
+              <div style={{
+                height: '525px',
+                backgroundImage: `url("${this.state.outerlayerSrc}")`,
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center'
+              }}/>)
+            }/>
         </StyledMasonry>
       )
     }
@@ -104,4 +140,4 @@ const mapDispatchToProps = (dispatch) => ({
   getImageSrc: () => dispatch(getImageSrc())
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(WrapWithDataComponent(Wrapper))
+export default connect(mapStateToProps, mapDispatchToProps)(WrapWithDataComponent(Images))

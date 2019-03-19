@@ -1,10 +1,6 @@
 import React, { Component } from 'react'
 import styled from 'styled-components'
 import { connect } from 'react-redux'
-import BraftEditor from 'braft-editor'
-import 'braft-editor/dist/index.css'
-import 'braft-extensions/dist/code-highlighter.css'
-import CodeHighlighter from 'braft-extensions/dist/code-highlighter'
 import {
   handleQueryComments,
   handlePublishComment,
@@ -14,15 +10,14 @@ import {
   initInputField,
   transmitValues
 } from '../../actions/blog'
+import PostContent from './PostContent'
 import CommentsList from '../stateless_component/CommentsList'
 import User from '../stateless_component/User'
 import Dropdown from '../stateless_component/Dropdown'
 import Timestamp from '../stateless_component/Timestamp'
+import Outerlayer from './Outerlayer'
 import CommentEditor from './CommentEditor'
-import UpdateCommentEditor from './UpdateCommentEditor'
-import UpdatePostEditor from './UpdatePostEditor'
-
-BraftEditor.use(CodeHighlighter())
+import PostEditor from './PostEditor'
 
 const StyledPost = styled.div`
     &>.post-container {
@@ -36,6 +31,7 @@ const StyledPost = styled.div`
 
       &>.post-container>div:nth-of-type(1)>h2 {
         word-wrap: break-word;
+        font-weight: bold;
       }
 
       &>.post-container>.user {
@@ -49,12 +45,6 @@ const StyledPost = styled.div`
         pointer-events: none;
         height: 0;
         opacity: 0;
-      }
-
-      &>.post-container .bf-content {
-        border: .1rem solid;
-        box-sizing: border-box;
-        border-radius: .5rem;
       }
 `
 
@@ -143,9 +133,7 @@ class Post extends Component {
             <div className="user">
               <User avatar={avatar} user_id={user_id} username={author}/>
             </div>
-            <BraftEditor
-              readOnly={true} 
-              defaultValue={BraftEditor.createEditorState(content)}/>
+            <PostContent content={content}/>
             <div className="timeStamp">
               <Timestamp created_at={created_at} updated_at={updated_at}/>
             </div>
@@ -161,18 +149,20 @@ class Post extends Component {
             handleStartUp={this._handleOpenCommentEditor}
             handleDelComment={this._handleDelComment}/>
         </StyledPost>
-        <UpdateCommentEditor
+        <Outerlayer
           outerlayer={this.setCommentEditorLayerRef}
           alive={this.state.currentUpdateEditor==='commentEditor'}
           handleShutDown={this._handleCloseCommentEditor}
           inputField={updateCommentEditorFields}
-          handleSubmit={this.state.handleUpdate}/>
-        <UpdatePostEditor
+          handleSubmit={this.state.handleUpdate}
+          render={rest => (<CommentEditor {...rest}/>)}/>
+        <Outerlayer
           outerlayer={this.setPostEditorLayerRef}
           alive={this.state.currentUpdateEditor==='postEditor'}
           handleShutDown={this._handleClosePostEditor}
           inputField = {UpdatePostEditorFields}
-          handleSubmit={this.state.handleUpdate}/>
+          handleSubmit={this.state.handleUpdate}
+          render={rest => (<PostEditor {...rest}/>)}/>
       </>
     )
   }

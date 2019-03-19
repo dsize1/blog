@@ -30,8 +30,8 @@ const CommentEditor = (props) => {
 }
 
 CommentEditor.propTypes = {
-  handleSubmit: PropTypes.func.isRequired,
-  inputField: PropTypes.object.isRequired
+  handleSubmit: PropTypes.func,
+  inputField: PropTypes.object
 }
 
 export default CommentEditor
